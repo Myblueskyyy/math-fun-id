@@ -1,0 +1,28 @@
+﻿Analyzing math-fun...                                           
+
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\home\home_screen.dart:172:35 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\home\home_screen.dart:220:43 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\home\home_screen.dart:235:36 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\home\home_screen.dart:290:33 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\home\intro_screen.dart:37:44 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\materi\materi_list_screen.dart:119:43 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\quiz\quiz_screen.dart:30:52 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\quiz\quiz_screen.dart:126:37 - deprecated_member_use
+
+flutter : 8 issues 
+found. (ran in 1.1s)
+At line:1 char:1
++ flutter analyze > 
+analysis.txt 2>&1
++ ~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~
+    + CategoryInfo    
+          : NotSpeci  
+  fied: (8 issues f   
+ ound. (ran in 1.1    
+s):String) [], Re    
+moteException
+    + FullyQualifiedE 
+   rrorId : NativeCo  
+  mmandError
+ 
