@@ -1,0 +1,8 @@
+[info] 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss (C:\Users\ITPST057\Flutter Projects\math-fun\lib\features\home\home_screen.dart:172:35)
+[info] 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss (C:\Users\ITPST057\Flutter Projects\math-fun\lib\features\home\home_screen.dart:220:43)
+[info] 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss (C:\Users\ITPST057\Flutter Projects\math-fun\lib\features\home\home_screen.dart:235:36)
+[info] 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss (C:\Users\ITPST057\Flutter Projects\math-fun\lib\features\home\home_screen.dart:290:33)
+[info] 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss (C:\Users\ITPST057\Flutter Projects\math-fun\lib\features\home\intro_screen.dart:37:44)
+[info] 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss (C:\Users\ITPST057\Flutter Projects\math-fun\lib\features\materi\materi_list_screen.dart:119:43)
+[info] 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss (C:\Users\ITPST057\Flutter Projects\math-fun\lib\features\quiz\quiz_screen.dart:30:52)
+[info] 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss (C:\Users\ITPST057\Flutter Projects\math-fun\lib\features\quiz\quiz_screen.dart:126:37)
