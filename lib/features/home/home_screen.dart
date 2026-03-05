@@ -32,16 +32,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildBody(BuildContext context) {
-    if (_selectedIndex == 1) {
-      return const Center(
-        child: Text(
-          'Profil Screen',
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-        ),
-      );
-    }
-
-    // Index 0 (Menu) and 2 (Mode - though it toggles) show the Menu body by default
     return Column(
       children: [
         _buildHeader(),
@@ -371,7 +361,7 @@ class _HomeScreenState extends State<HomeScreen> {
         child: BottomNavigationBar(
           currentIndex: _selectedIndex,
           onTap: (index) {
-            if (index == 2) {
+            if (index == 1) {
               themeProvider.toggleTheme();
             } else {
               setState(() {
@@ -394,13 +384,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Icon(Icons.home_rounded, size: 28),
               ),
               label: 'Menu',
-            ),
-            const BottomNavigationBarItem(
-              icon: Padding(
-                padding: EdgeInsets.only(bottom: 4.0),
-                child: Icon(Icons.face_retouching_natural_rounded, size: 28),
-              ),
-              label: 'Profil',
             ),
             BottomNavigationBarItem(
               icon: Padding(
