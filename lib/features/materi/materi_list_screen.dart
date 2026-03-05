@@ -164,6 +164,7 @@ class MateriListScreen extends StatelessWidget {
               );
             },
           ),
+        ),
       ),
     );
   }
