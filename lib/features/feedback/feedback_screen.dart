@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_email_sender/flutter_email_sender.dart';
 import '../../core/constants/app_colors.dart';
-import '../../shared/widgets/custom_button.dart';
+import '../../core/widgets/bubbly_background.dart';
+import '../../core/widgets/bubbly_button.dart';
 import '../../shared/widgets/custom_card.dart';
 
 class FeedbackScreen extends StatefulWidget {
@@ -41,17 +42,22 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      extendBodyBehindAppBar: true,
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
         title: const Text('Kesimpulan'),
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24.0),
-        child: _isSubmitted
-            ? _buildSuccessState(context)
-            : _buildFormState(context),
+      body: BubblyBackground(
+        child: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(24.0),
+            child: _isSubmitted
+                ? _buildSuccessState(context)
+                : _buildFormState(context),
+          ),
+        ),
       ),
     );
   }
@@ -96,9 +102,13 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
           ),
         ),
         const SizedBox(height: 32),
-        CustomButton(
-          label: 'Kirim Masukan',
-          onPressed: () {
+        BubblyButton(
+          title: 'Kirim Masukan',
+          icon: Icons.send_rounded,
+          mainColor: const Color(0xFFBA68C8), // Purple
+          shadowColor: const Color(0xFF8E24AA),
+          isFullWidth: true,
+          onTap: () {
             if (_feedbackController.text.isNotEmpty) {
               _sendEmail();
             } else {
@@ -145,9 +155,13 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
             ),
           ),
           const SizedBox(height: 48),
-          CustomButton(
-            label: 'Kembali ke Menu',
-            onPressed: () => Navigator.pop(context),
+          BubblyButton(
+            title: 'Kembali ke Menu',
+            icon: Icons.home_rounded,
+            mainColor: const Color(0xFF64B5F6),
+            shadowColor: const Color(0xFF1E88E5),
+            isFullWidth: true,
+            onTap: () => Navigator.pop(context),
           ),
         ],
       ),

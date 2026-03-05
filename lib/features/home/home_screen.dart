@@ -8,6 +8,8 @@ import '../quiz/quiz_screen.dart';
 import 'intro_screen.dart';
 import '../materi/materi_list_screen.dart';
 import '../feedback/feedback_screen.dart';
+import '../../core/widgets/bubbly_background.dart';
+import '../../core/widgets/bubbly_button.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -24,252 +26,8 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFE0F7FA), // Soft cyan background pattern
       extendBody: true, // Allow body to stretch behind the navbar
-      body: Stack(
-        children: [
-          _buildBackgroundGradient(),
-          _buildMathSymbols(),
-          _buildBody(context),
-        ],
-      ),
+      body: BubblyBackground(child: _buildBody(context)),
       bottomNavigationBar: _buildBottomNavigationBar(),
-    );
-  }
-
-  Widget _buildBackgroundGradient() {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: isDark
-              ? [const Color(0xFF1E3A8A), const Color(0xFF0F172A)]
-              : [const Color(0xFFE0F7FA), const Color(0xFFB2EBF2)],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildMathSymbols() {
-    return const Stack(
-      children: [
-        // Top section
-        Positioned(
-          top: 60,
-          left: 20,
-          child: Opacity(
-            opacity: 0.15,
-            child: Text(
-              '+',
-              style: TextStyle(fontSize: 45, fontWeight: FontWeight.bold),
-            ),
-          ),
-        ),
-        Positioned(
-          top: 100,
-          left: 180,
-          child: Opacity(
-            opacity: 0.1,
-            child: Text(
-              '%',
-              style: TextStyle(fontSize: 35, fontWeight: FontWeight.bold),
-            ),
-          ),
-        ),
-        Positioned(
-          top: 80,
-          right: 30,
-          child: Opacity(
-            opacity: 0.15,
-            child: Text(
-              '×',
-              style: TextStyle(fontSize: 50, fontWeight: FontWeight.bold),
-            ),
-          ),
-        ),
-        Positioned(
-          top: 150,
-          right: 120,
-          child: Opacity(
-            opacity: 0.12,
-            child: Text(
-              '=',
-              style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold),
-            ),
-          ),
-        ),
-
-        // Middle section
-        Positioned(
-          top: 250,
-          left: 40,
-          child: Opacity(
-            opacity: 0.15,
-            child: Text(
-              '÷',
-              style: TextStyle(fontSize: 55, fontWeight: FontWeight.bold),
-            ),
-          ),
-        ),
-        Positioned(
-          top: 220,
-          right: 60,
-          child: Opacity(
-            opacity: 0.1,
-            child: Text(
-              '+',
-              style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
-            ),
-          ),
-        ),
-        Positioned(
-          top: 320,
-          left: 160,
-          child: Opacity(
-            opacity: 0.15,
-            child: Text(
-              '-',
-              style: TextStyle(fontSize: 60, fontWeight: FontWeight.bold),
-            ),
-          ),
-        ),
-        Positioned(
-          top: 350,
-          right: 40,
-          child: Opacity(
-            opacity: 0.12,
-            child: Text(
-              '×',
-              style: TextStyle(fontSize: 45, fontWeight: FontWeight.bold),
-            ),
-          ),
-        ),
-        Positioned(
-          top: 420,
-          left: 70,
-          child: Opacity(
-            opacity: 0.15,
-            child: Text(
-              '=',
-              style: TextStyle(fontSize: 50, fontWeight: FontWeight.bold),
-            ),
-          ),
-        ),
-        Positioned(
-          top: 450,
-          right: 140,
-          child: Opacity(
-            opacity: 0.1,
-            child: Text(
-              '%',
-              style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold),
-            ),
-          ),
-        ),
-
-        // Lower middle section
-        Positioned(
-          top: 550,
-          left: 30,
-          child: Opacity(
-            opacity: 0.15,
-            child: Text(
-              '+',
-              style: TextStyle(fontSize: 50, fontWeight: FontWeight.bold),
-            ),
-          ),
-        ),
-        Positioned(
-          top: 520,
-          right: 70,
-          child: Opacity(
-            opacity: 0.15,
-            child: Text(
-              '-',
-              style: TextStyle(fontSize: 65, fontWeight: FontWeight.bold),
-            ),
-          ),
-        ),
-        Positioned(
-          top: 600,
-          right: 180,
-          child: Opacity(
-            opacity: 0.12,
-            child: Text(
-              '÷',
-              style: TextStyle(fontSize: 45, fontWeight: FontWeight.bold),
-            ),
-          ),
-        ),
-
-        // Bottom section (using bottom property for different screen sizes)
-        Positioned(
-          bottom: 250,
-          left: 60,
-          child: Opacity(
-            opacity: 0.12,
-            child: Text(
-              '×',
-              style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold),
-            ),
-          ),
-        ),
-        Positioned(
-          bottom: 200,
-          right: 40,
-          child: Opacity(
-            opacity: 0.15,
-            child: Text(
-              '=',
-              style: TextStyle(fontSize: 55, fontWeight: FontWeight.bold),
-            ),
-          ),
-        ),
-        Positioned(
-          bottom: 120,
-          left: 120,
-          child: Opacity(
-            opacity: 0.1,
-            child: Text(
-              '%',
-              style: TextStyle(fontSize: 45, fontWeight: FontWeight.bold),
-            ),
-          ),
-        ),
-        Positioned(
-          bottom: 80,
-          right: 80,
-          child: Opacity(
-            opacity: 0.15,
-            child: Text(
-              '+',
-              style: TextStyle(fontSize: 50, fontWeight: FontWeight.bold),
-            ),
-          ),
-        ),
-        Positioned(
-          bottom: 40,
-          left: 40,
-          child: Opacity(
-            opacity: 0.12,
-            child: Text(
-              '-',
-              style: TextStyle(fontSize: 60, fontWeight: FontWeight.bold),
-            ),
-          ),
-        ),
-        Positioned(
-          bottom: 150,
-          left: 200,
-          child: Opacity(
-            opacity: 0.15,
-            child: Text(
-              '÷',
-              style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold),
-            ),
-          ),
-        ),
-      ],
     );
   }
 
@@ -321,8 +79,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 Row(
                   children: [
                     Expanded(
-                      child: _buildBubblyButton(
-                        context,
+                      child: BubblyButton(
                         title: 'Pendahuluan',
                         subtitle: 'Tujuan & Manfaat',
                         icon: Icons.smart_toy_rounded, // Robot icon
@@ -339,8 +96,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                     Expanded(
-                      child: _buildBubblyButton(
-                        context,
+                      child: BubblyButton(
                         title: 'Simulasi\n(Pre-test)',
                         subtitle: '5 Soal Latihan',
                         icon: Icons.star_rounded, // Star icon
@@ -368,8 +124,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 Row(
                   children: [
                     Expanded(
-                      child: _buildBubblyButton(
-                        context,
+                      child: BubblyButton(
                         title: 'Materi\nBelajar',
                         subtitle: 'Konsep & Rumus',
                         icon: Icons.auto_awesome_rounded, // Wizard/Magic icon
@@ -386,8 +141,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                     Expanded(
-                      child: _buildBubblyButton(
-                        context,
+                      child: BubblyButton(
                         title: 'Evaluasi\n(Post-test)',
                         subtitle: 'Uji Pemahaman',
                         icon: Icons.inventory_2_rounded, // Treasure icon
@@ -412,8 +166,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ],
                 ),
-                _buildBubblyButton(
-                  context,
+                BubblyButton(
                   title: 'Kesimpulan',
                   subtitle: 'Kesan & Pesan',
                   icon: Icons.cloud_rounded, // Cloud icon
@@ -433,115 +186,6 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildBubblyButton(
-    BuildContext context, {
-    required String title,
-    required String subtitle,
-    required IconData icon,
-    required Color mainColor,
-    required Color shadowColor,
-    required VoidCallback onTap,
-    bool isFullWidth = false,
-  }) {
-    final double paddingVert = isFullWidth ? 20 : 16;
-    final double paddingHoriz = isFullWidth ? 24 : 8;
-
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
-        padding: const EdgeInsets.only(bottom: 8), // 3D shadow depth
-        decoration: BoxDecoration(
-          color: shadowColor,
-          borderRadius: BorderRadius.circular(24),
-        ),
-        child: Container(
-          padding: EdgeInsets.symmetric(
-            vertical: paddingVert,
-            horizontal: paddingHoriz,
-          ),
-          decoration: BoxDecoration(
-            color: mainColor,
-            borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: Colors.white.withOpacity(0.5), width: 3),
-          ),
-          child: isFullWidth
-              ? Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(icon, size: 50, color: Colors.white),
-                    const SizedBox(width: 16),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          title,
-                          style: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w900,
-                            color: Colors.white,
-                            height: 1.1,
-                            shadows: [
-                              Shadow(
-                                blurRadius: 4,
-                                color: Colors.black26,
-                                offset: Offset(0, 2),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          subtitle,
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white.withOpacity(0.95),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                )
-              : Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(icon, size: 50, color: Colors.white),
-                    const SizedBox(height: 12),
-                    Text(
-                      title,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w900,
-                        color: Colors.white,
-                        height: 1.1,
-                        shadows: [
-                          Shadow(
-                            blurRadius: 4,
-                            color: Colors.black26,
-                            offset: Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      subtitle,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white.withOpacity(0.95),
-                      ),
-                    ),
-                  ],
-                ),
-        ),
-      ),
     );
   }
 

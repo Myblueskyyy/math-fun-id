@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../core/constants/app_colors.dart';
 import '../../shared/models/materi.dart';
 import '../../shared/widgets/custom_card.dart';
+import '../../core/widgets/bubbly_background.dart';
 import 'materi_detail_screen.dart';
 
 class MateriListScreen extends StatelessWidget {
@@ -90,75 +91,80 @@ class MateriListScreen extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      extendBodyBehindAppBar: true,
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
         title: const Text('Materi Aritmatika Sosial'),
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
-      body: ListView.builder(
-        padding: const EdgeInsets.all(20),
-        itemCount: listMateri.length,
-        itemBuilder: (context, index) {
-          final materi = listMateri[index];
-          return Padding(
-            padding: const EdgeInsets.only(bottom: 16.0),
-            child: CustomCard(
-              onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => MateriDetailScreen(materi: materi),
+      body: BubblyBackground(
+        child: SafeArea(
+          child: ListView.builder(
+            padding: const EdgeInsets.all(20),
+            itemCount: listMateri.length,
+            itemBuilder: (context, index) {
+              final materi = listMateri[index];
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 16.0),
+                child: CustomCard(
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => MateriDetailScreen(materi: materi),
+                    ),
+                  ),
+                  color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: materi.color.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Icon(materi.icon, color: materi.color, size: 30),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              materi.title,
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: isDark
+                                    ? Colors.white
+                                    : AppColors.textPrimary,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              materi.description,
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: isDark
+                                    ? Colors.white70
+                                    : AppColors.textSecondary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Icon(
+                        Icons.arrow_forward_ios_rounded,
+                        size: 16,
+                        color: isDark ? Colors.white24 : Colors.grey,
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
-              child: Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: materi.color.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Icon(materi.icon, color: materi.color, size: 30),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          materi.title,
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: isDark
-                                ? Colors.white
-                                : AppColors.textPrimary,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          materi.description,
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: isDark
-                                ? Colors.white70
-                                : AppColors.textSecondary,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Icon(
-                    Icons.arrow_forward_ios_rounded,
-                    size: 16,
-                    color: isDark ? Colors.white24 : Colors.grey,
-                  ),
-                ],
-              ),
-            ),
-          );
-        },
+              );
+            },
+          ),
+        ),
       ),
     );
   }

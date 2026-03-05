@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
-import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_strings.dart';
+import '../../core/widgets/bubbly_background.dart';
 import 'home_screen.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -42,8 +42,7 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(gradient: AppColors.primaryGradient),
+      body: BubblyBackground(
         child: Center(
           child: FadeTransition(
             opacity: _fadeAnimation,

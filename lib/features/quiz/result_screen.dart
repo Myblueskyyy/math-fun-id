@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/constants/app_colors.dart';
-import '../../shared/widgets/custom_button.dart';
+import '../../core/widgets/bubbly_background.dart';
+import '../../core/widgets/bubbly_button.dart';
 import '../../shared/widgets/custom_card.dart';
 import 'quiz_provider.dart';
 
@@ -19,47 +20,58 @@ class ResultScreen extends StatelessWidget {
         final isDark = Theme.of(context).brightness == Brightness.dark;
 
         return Scaffold(
-          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          extendBodyBehindAppBar: true,
+          backgroundColor: Colors.transparent,
           appBar: AppBar(
             title: const Text('Hasil Akhir'),
+            backgroundColor: Colors.transparent,
+            elevation: 0,
             automaticallyImplyLeading: false,
           ),
-          body: SingleChildScrollView(
-            padding: const EdgeInsets.all(24.0),
-            child: Column(
-              children: [
-                _buildHeader(
-                  context,
-                  provider.score,
-                  provider.questions.length,
-                  scorePercentage,
-                ),
-                const SizedBox(height: 32),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    'Pembahasan Soal',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: isDark ? Colors.white : Colors.black,
+          body: BubblyBackground(
+            child: SafeArea(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
+                  children: [
+                    _buildHeader(
+                      context,
+                      provider.score,
+                      provider.questions.length,
+                      scorePercentage,
                     ),
-                  ),
+                    const SizedBox(height: 32),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'Pembahasan Soal',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: isDark ? Colors.white : Colors.black,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    ...List.generate(
+                      provider.questions.length,
+                      (index) => _buildDiscussionCard(context, provider, index),
+                    ),
+                    const SizedBox(height: 32),
+                    BubblyButton(
+                      title: 'Kembali ke Menu Utama',
+                      icon: Icons.home_rounded,
+                      mainColor: const Color(0xFF64B5F6),
+                      shadowColor: const Color(0xFF1E88E5),
+                      isFullWidth: true,
+                      onTap: () {
+                        provider.reset();
+                        Navigator.popUntil(context, (route) => route.isFirst);
+                      },
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 16),
-                ...List.generate(
-                  provider.questions.length,
-                  (index) => _buildDiscussionCard(context, provider, index),
-                ),
-                const SizedBox(height: 32),
-                CustomButton(
-                  label: 'Kembali ke Menu Utama',
-                  onPressed: () {
-                    provider.reset();
-                    Navigator.popUntil(context, (route) => route.isFirst);
-                  },
-                ),
-              ],
+              ),
             ),
           ),
         );

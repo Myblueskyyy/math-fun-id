@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../core/constants/app_colors.dart';
 import '../../shared/models/materi.dart';
 import '../../shared/widgets/custom_card.dart';
+import '../../core/widgets/bubbly_background.dart';
 
 class MateriDetailScreen extends StatelessWidget {
   final Materi materi;
@@ -13,72 +14,77 @@ class MateriDetailScreen extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      body: CustomScrollView(
-        slivers: [
-          SliverAppBar(
-            expandedHeight: 150.0,
-            pinned: true,
-            flexibleSpace: FlexibleSpaceBar(
-              title: Text(
-                materi.title,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
+      backgroundColor: Colors.transparent,
+      body: BubblyBackground(
+        child: CustomScrollView(
+          slivers: [
+            SliverAppBar(
+              expandedHeight: 150.0,
+              pinned: true,
+              flexibleSpace: FlexibleSpaceBar(
+                title: Text(
+                  materi.title,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
                 ),
+                background: Container(color: materi.color),
               ),
-              background: Container(color: materi.color),
             ),
-          ),
-          SliverPadding(
-            padding: const EdgeInsets.all(24.0),
-            sliver: SliverList(
-              delegate: SliverChildListDelegate([
-                Text(
-                  'Penjelasan',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: isDark ? Colors.white : AppColors.textPrimary,
+            SliverPadding(
+              padding: const EdgeInsets.all(24.0),
+              sliver: SliverList(
+                delegate: SliverChildListDelegate([
+                  Text(
+                    'Penjelasan',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: isDark ? Colors.white : AppColors.textPrimary,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  materi.content,
-                  style: TextStyle(
-                    fontSize: 16,
-                    height: 1.6,
-                    color: isDark ? Colors.white70 : AppColors.textPrimary,
+                  const SizedBox(height: 12),
+                  Text(
+                    materi.content,
+                    style: TextStyle(
+                      fontSize: 16,
+                      height: 1.6,
+                      color: isDark ? Colors.white70 : AppColors.textPrimary,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 32),
-                Text(
-                  'Rumus Utama',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: isDark ? Colors.white : AppColors.textPrimary,
+                  const SizedBox(height: 32),
+                  Text(
+                    'Rumus Utama',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: isDark ? Colors.white : AppColors.textPrimary,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 12),
-                ...materi.formulas.entries.map(
-                  (entry) => _buildFormulaRow(context, entry.key, entry.value),
-                ),
-                const SizedBox(height: 32),
-                Text(
-                  'Contoh Soal',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: isDark ? Colors.white : AppColors.textPrimary,
+                  const SizedBox(height: 12),
+                  ...materi.formulas.entries.map(
+                    (entry) =>
+                        _buildFormulaRow(context, entry.key, entry.value),
                   ),
-                ),
-                const SizedBox(height: 16),
-                ...materi.examples.map((ex) => _buildExampleCard(context, ex)),
-              ]),
+                  const SizedBox(height: 32),
+                  Text(
+                    'Contoh Soal',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: isDark ? Colors.white : AppColors.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  ...materi.examples.map(
+                    (ex) => _buildExampleCard(context, ex),
+                  ),
+                ]),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
