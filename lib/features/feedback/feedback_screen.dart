@@ -58,7 +58,8 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                 : _buildFormState(context),
           ),
         ),
-      ),
+    );
+  }
     );
   }
 
@@ -162,6 +163,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
             shadowColor: const Color(0xFF1E88E5),
             isFullWidth: true,
             onTap: () => Navigator.pop(context),
+          ),
           ),
         ],
       ),
