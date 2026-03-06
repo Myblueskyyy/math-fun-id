@@ -8,6 +8,11 @@ class Materi {
   final List<ExampleQuestion> examples;
   final IconData icon;
   final Color color;
+  final Widget Function(BuildContext)? interactiveWidget;
+
+  // New Visual Learning Properties
+  final String? caseStudy;
+  final Widget Function(BuildContext)? visualIllustrationWidget;
 
   Materi({
     required this.title,
@@ -17,6 +22,9 @@ class Materi {
     required this.examples,
     required this.icon,
     required this.color,
+    this.interactiveWidget,
+    this.caseStudy,
+    this.visualIllustrationWidget,
   });
 }
 

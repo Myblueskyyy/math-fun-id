@@ -2,29 +2,64 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/widgets/bubbly_background.dart';
-import '../../core/widgets/bubbly_button.dart';
 import '../../shared/widgets/custom_card.dart';
 import 'quiz_provider.dart';
 import 'result_screen.dart';
 
-class QuizScreen extends StatelessWidget {
+class QuizScreen extends StatefulWidget {
   final String title;
 
   const QuizScreen({super.key, required this.title});
 
   @override
+  State<QuizScreen> createState() => _QuizScreenState();
+}
+
+class _QuizScreenState extends State<QuizScreen> {
+  QuizProvider? _provider;
+  bool _navigated = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Add post frame callback to safely add the listener
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _provider = context.read<QuizProvider>();
+      _provider?.addListener(_onProviderUpdate);
+    });
+  }
+
+  void _onProviderUpdate() {
+    if (!mounted) return;
+    if (_provider?.isCompleted == true && !_navigated) {
+      _navigated = true;
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => ResultScreen(title: widget.title)),
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    _provider?.removeListener(_onProviderUpdate);
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Consumer<QuizProvider>(
       builder: (context, provider, child) {
-        final question = provider.currentQuestion;
+        if (provider.questions.isEmpty) return const SizedBox.shrink();
 
+        final question = provider.currentQuestion;
         final isDark = Theme.of(context).brightness == Brightness.dark;
 
         return Scaffold(
           extendBodyBehindAppBar: true,
           backgroundColor: Colors.transparent,
           appBar: AppBar(
-            title: Text(title),
+            title: Text(widget.title),
             backgroundColor: Colors.transparent,
             elevation: 0,
             bottom: PreferredSize(
@@ -43,17 +78,18 @@ class QuizScreen extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.all(24.0),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Text(
                       'Pertanyaan ${provider.currentIndex + 1}/${provider.questions.length}',
                       style: const TextStyle(
-                        fontSize: 14,
+                        fontSize: 16,
                         fontWeight: FontWeight.bold,
                         color: AppColors.primary,
                       ),
+                      textAlign: TextAlign.center,
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 20),
                     Expanded(
                       child: SingleChildScrollView(
                         child: Column(
@@ -80,37 +116,11 @@ class QuizScreen extends StatelessWidget {
                               question.options.length,
                               (index) => _buildOption(context, provider, index),
                             ),
+                            if (provider.isProcessingFeedback)
+                              _buildFeedbackOverlay(provider),
                           ],
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 24),
-                    BubblyButton(
-                      title: provider.isLastQuestion ? 'Selesai' : 'Lanjut',
-                      isFullWidth: true,
-                      onTap: provider.userAnswers[provider.currentIndex] != null
-                          ? () {
-                              if (provider.isLastQuestion) {
-                                provider.nextQuestion();
-                                Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => ResultScreen(title: title),
-                                  ),
-                                );
-                              } else {
-                                provider.nextQuestion();
-                              }
-                            }
-                          : () {},
-                      mainColor:
-                          provider.userAnswers[provider.currentIndex] != null
-                          ? const Color(0xFF64B5F6)
-                          : (isDark ? Colors.white24 : Colors.grey.shade400),
-                      shadowColor:
-                          provider.userAnswers[provider.currentIndex] != null
-                          ? const Color(0xFF1E88E5)
-                          : (isDark ? Colors.white12 : Colors.grey.shade600),
                     ),
                   ],
                 ),
@@ -122,28 +132,99 @@ class QuizScreen extends StatelessWidget {
     );
   }
 
+  Widget _buildFeedbackOverlay(QuizProvider provider) {
+    final userAnswer = provider.userAnswers[provider.currentIndex];
+    final isCorrect = userAnswer == provider.currentQuestion.correctAnswerIndex;
+    final isTimeout = userAnswer == -1;
+
+    Color color;
+    IconData icon;
+    String text;
+
+    if (isTimeout) {
+      color = Colors.orange;
+      icon = Icons.timer_off_rounded;
+      text = "Waktu Habis!";
+    } else if (isCorrect) {
+      color = Colors.green;
+      icon = Icons.check_circle_rounded;
+      text = "Benar!";
+    } else {
+      color = Colors.redAccent;
+      icon = Icons.cancel_rounded;
+      text = "Salah!";
+    }
+
+    return Container(
+      margin: const EdgeInsets.only(top: 24),
+      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.15),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: color, width: 2),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, color: color, size: 36),
+          const SizedBox(width: 12),
+          Text(
+            text,
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: color,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildOption(BuildContext context, QuizProvider provider, int index) {
-    final isSelected = provider.userAnswers[provider.currentIndex] == index;
+    final userAnswer = provider.userAnswers[provider.currentIndex];
+    final isSelected = userAnswer == index;
+    final isCorrectOption =
+        index == provider.currentQuestion.correctAnswerIndex;
+
+    // Determine boundary colors if an answer is selected
+    bool showCorrect = userAnswer != null && isCorrectOption;
+    bool showWrong = userAnswer != null && isSelected && !isCorrectOption;
+
     final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    Color borderColor = Colors.transparent;
+    Color bgColor = isDark ? const Color(0xFF1E1E1E) : Colors.white;
+
+    if (showCorrect) {
+      borderColor = Colors.green;
+      bgColor = Colors.green.withOpacity(0.1);
+    } else if (showWrong) {
+      borderColor = Colors.redAccent;
+      bgColor = Colors.redAccent.withOpacity(0.1);
+    } else if (userAnswer == null) {
+      borderColor = isDark ? Colors.white10 : Colors.grey.shade200;
+    } else {
+      // Dim other options when an answer is selected
+      borderColor = isDark ? Colors.white10 : Colors.grey.shade200;
+      bgColor = isDark ? Colors.grey.shade900 : Colors.grey.shade100;
+    }
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 12.0),
-      child: InkWell(
-        onTap: () => provider.answerQuestion(index),
-        borderRadius: BorderRadius.circular(16),
-        child: Container(
+      child: GestureDetector(
+        onTap: () {
+          if (userAnswer == null) {
+            provider.answerQuestion(index);
+          }
+        },
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
           padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
           decoration: BoxDecoration(
-            color: isSelected
-                ? AppColors.primary.withOpacity(0.1)
-                : (isDark ? const Color(0xFF1E1E1E) : Colors.white),
+            color: bgColor,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: isSelected
-                  ? AppColors.primary
-                  : (isDark ? Colors.white10 : Colors.grey.shade200),
-              width: 2,
-            ),
+            border: Border.all(color: borderColor, width: 2),
           ),
           child: Row(
             children: [
@@ -151,16 +232,18 @@ class QuizScreen extends StatelessWidget {
                 width: 30,
                 height: 30,
                 decoration: BoxDecoration(
-                  color: isSelected
-                      ? AppColors.primary
-                      : (isDark ? Colors.white12 : Colors.grey.shade100),
+                  color: showCorrect
+                      ? Colors.green
+                      : showWrong
+                      ? Colors.redAccent
+                      : (isDark ? Colors.white12 : Colors.grey.shade200),
                   shape: BoxShape.circle,
                 ),
                 child: Center(
                   child: Text(
                     String.fromCharCode(65 + index),
                     style: TextStyle(
-                      color: isSelected
+                      color: (showCorrect || showWrong)
                           ? Colors.white
                           : (isDark ? Colors.white70 : AppColors.textSecondary),
                       fontWeight: FontWeight.bold,
@@ -174,15 +257,19 @@ class QuizScreen extends StatelessWidget {
                   provider.currentQuestion.options[index],
                   style: TextStyle(
                     fontSize: 16,
-                    fontWeight: isSelected
+                    fontWeight: (showCorrect || showWrong)
                         ? FontWeight.bold
                         : FontWeight.normal,
-                    color: isSelected
-                        ? AppColors.primary
+                    color: (showCorrect || showWrong)
+                        ? borderColor
                         : (isDark ? Colors.white : AppColors.textPrimary),
                   ),
                 ),
               ),
+              if (showCorrect)
+                const Icon(Icons.check_circle_rounded, color: Colors.green)
+              else if (showWrong)
+                const Icon(Icons.cancel_rounded, color: Colors.redAccent),
             ],
           ),
         ),

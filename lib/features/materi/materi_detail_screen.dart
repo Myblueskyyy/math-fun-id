@@ -1,85 +1,55 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../../core/constants/app_colors.dart';
 import '../../shared/models/materi.dart';
 import '../../shared/widgets/custom_card.dart';
 import '../../core/widgets/bubbly_background.dart';
+import 'visual_novel/data/story_data.dart';
+import 'visual_novel/models/story_node.dart';
+import 'visual_novel/presentation/vn_screen.dart';
 
-class MateriDetailScreen extends StatelessWidget {
+class MateriDetailScreen extends StatefulWidget {
   final Materi materi;
 
   const MateriDetailScreen({super.key, required this.materi});
 
   @override
+  State<MateriDetailScreen> createState() => _MateriDetailScreenState();
+}
+
+class _MateriDetailScreenState extends State<MateriDetailScreen> {
+  @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    return _buildScaffold(context, isDark);
+  }
 
+  Widget _buildScaffold(BuildContext context, bool isDark) {
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: BubblyBackground(
         child: CustomScrollView(
+          physics: const BouncingScrollPhysics(),
           slivers: [
             SliverAppBar(
               expandedHeight: 150.0,
               pinned: true,
               flexibleSpace: FlexibleSpaceBar(
                 title: Text(
-                  materi.title,
+                  widget.materi.title,
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
                   ),
                 ),
-                background: Container(color: materi.color),
+                background: Container(color: widget.materi.color),
               ),
             ),
             SliverPadding(
               padding: const EdgeInsets.all(24.0),
               sliver: SliverList(
                 delegate: SliverChildListDelegate([
-                  Text(
-                    'Penjelasan',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: isDark ? Colors.white : AppColors.textPrimary,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    materi.content,
-                    style: TextStyle(
-                      fontSize: 16,
-                      height: 1.6,
-                      color: isDark ? Colors.white70 : AppColors.textPrimary,
-                    ),
-                  ),
-                  const SizedBox(height: 32),
-                  Text(
-                    'Rumus Utama',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: isDark ? Colors.white : AppColors.textPrimary,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  ...materi.formulas.entries.map(
-                    (entry) =>
-                        _buildFormulaRow(context, entry.key, entry.value),
-                  ),
-                  const SizedBox(height: 32),
-                  Text(
-                    'Contoh Soal',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: isDark ? Colors.white : AppColors.textPrimary,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  ...materi.examples.map(
-                    (ex) => _buildExampleCard(context, ex),
-                  ),
+                  ..._buildContent(context, isDark),
                 ]),
               ),
             ),
@@ -87,6 +57,144 @@ class MateriDetailScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  List<Widget> _buildContent(BuildContext context, bool isDark) {
+    return [
+      Text(
+        'Konsep Dasar',
+        style: TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+          color: isDark ? Colors.white : AppColors.textPrimary,
+        ),
+      ),
+      const SizedBox(height: 12),
+      Text(
+        widget.materi.content,
+        style: TextStyle(
+          fontSize: 16,
+          height: 1.6,
+          color: isDark ? Colors.white70 : AppColors.textPrimary,
+        ),
+      ),
+      const SizedBox(height: 24),
+
+      // 1.5 Visual Novel Integration
+      if (_hasVisualNovel(widget.materi.title)) ...[
+        Container(
+          width: double.infinity,
+          margin: const EdgeInsets.only(bottom: 24),
+          child: ElevatedButton.icon(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.purple.shade400,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              elevation: 4,
+            ),
+            onPressed: () => _launchVisualNovel(context, widget.materi.title),
+            icon: const Icon(Icons.videogame_asset_rounded, size: 28),
+            label: const Text(
+              'Mainkan Cerita Interaktif',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+          ),
+        ),
+      ],
+
+      // 2. Visual Illustration
+      if (widget.materi.visualIllustrationWidget != null)
+        widget.materi.visualIllustrationWidget!(context),
+
+      // 3. Case Study
+      if (widget.materi.caseStudy != null) ...[
+        Text(
+          'Studi Kasus di Kehidupan Nyata',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: isDark ? Colors.white : AppColors.textPrimary,
+          ),
+        ),
+        const SizedBox(height: 12),
+        Container(
+          padding: const EdgeInsets.all(16),
+          margin: const EdgeInsets.only(bottom: 24),
+          decoration: BoxDecoration(
+            color: isDark ? const Color(0xFF1E1E1E) : Colors.amber.shade50,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Colors.amber.shade200),
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Icon(
+                Icons.menu_book_rounded,
+                color: Colors.amber,
+                size: 28,
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  widget.materi.caseStudy!,
+                  style: TextStyle(
+                    fontSize: 15,
+                    height: 1.5,
+                    fontStyle: FontStyle.italic,
+                    color: isDark ? Colors.white70 : Colors.black87,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+
+      // 4. Interactive Simulation
+      if (widget.materi.interactiveWidget != null) ...[
+        const SizedBox(height: 8),
+        Text(
+          'Simulasi Interaktif',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: isDark ? Colors.white : AppColors.textPrimary,
+          ),
+        ),
+        const SizedBox(height: 16),
+        widget.materi.interactiveWidget!(context),
+      ],
+
+      const SizedBox(height: 32),
+
+      Text(
+        'Rumus Utama',
+        style: TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+          color: isDark ? Colors.white : AppColors.textPrimary,
+        ),
+      ),
+      const SizedBox(height: 12),
+      ...widget.materi.formulas.entries.map(
+        (entry) => _buildFormulaRow(context, entry.key, entry.value),
+      ),
+      const SizedBox(height: 32),
+      Text(
+        'Contoh Soal',
+        style: TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+          color: isDark ? Colors.white : AppColors.textPrimary,
+        ),
+      ),
+      const SizedBox(height: 16),
+      ...widget.materi.examples.map((ex) => _buildExampleCard(context, ex)),
+      const SizedBox(height: 40),
+    ];
   }
 
   Widget _buildFormulaRow(BuildContext context, String label, String formula) {
@@ -120,7 +228,7 @@ class MateriDetailScreen extends StatelessWidget {
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: materi.color,
+                color: widget.materi.color,
               ),
             ),
           ],
@@ -195,5 +303,35 @@ class MateriDetailScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  bool _hasVisualNovel(String title) {
+    return title == 'Jual-Beli' ||
+        title == 'Untung-Rugi' ||
+        title == 'Diskon' ||
+        title == 'Pajak';
+  }
+
+  void _launchVisualNovel(BuildContext context, String title) {
+    Map<String, StoryNode> storyData = {};
+    if (title == 'Jual-Beli') {
+      storyData = StoryData.getEpisode1();
+    } else if (title == 'Untung-Rugi') {
+      storyData = StoryData.getEpisode2();
+    } else if (title == 'Diskon') {
+      storyData = StoryData.getEpisode3();
+    } else if (title == 'Pajak') {
+      storyData = StoryData.getEpisode4();
+    }
+
+    if (storyData.isNotEmpty) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) =>
+              VnScreen(initialNode: storyData['start']!, storyNodes: storyData),
+        ),
+      );
+    }
   }
 }

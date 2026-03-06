@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'core/theme/app_theme.dart';
-import 'core/theme/theme_provider.dart';
-import 'features/home/splash_screen.dart';
+import 'features/home/welcome_screen.dart';
 import 'features/quiz/quiz_provider.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.landscapeRight,
+    DeviceOrientation.landscapeLeft,
+  ]);
+
   runApp(
     MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => QuizProvider()),
-        ChangeNotifierProvider(create: (_) => ThemeProvider()),
-      ],
+      providers: [ChangeNotifierProvider(create: (_) => QuizProvider())],
       child: const MathFunApp(),
     ),
   );
@@ -22,15 +25,11 @@ class MathFunApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
-
     return MaterialApp(
       title: 'Math Fun',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
-      themeMode: themeProvider.themeMode,
-      home: const SplashScreen(),
+      home: const WelcomeScreen(),
     );
   }
 }

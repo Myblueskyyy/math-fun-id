@@ -15,8 +15,9 @@ class ResultScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<QuizProvider>(
       builder: (context, provider, child) {
-        final scorePercentage =
-            (provider.score / provider.questions.length) * 100;
+        final totalQuestions = provider.questions.length;
+        final correctAnswers = provider.correctAnswersCount;
+
         final isDark = Theme.of(context).brightness == Brightness.dark;
 
         return Scaffold(
@@ -34,12 +35,7 @@ class ResultScreen extends StatelessWidget {
                 padding: const EdgeInsets.all(24.0),
                 child: Column(
                   children: [
-                    _buildHeader(
-                      context,
-                      provider.score,
-                      provider.questions.length,
-                      scorePercentage,
-                    ),
+                    _buildHeader(context, correctAnswers, totalQuestions),
                     const SizedBox(height: 32),
                     Align(
                       alignment: Alignment.centerLeft,
@@ -53,8 +49,9 @@ class ResultScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 16),
+                    // Only show discussion up to the index users reached.
                     ...List.generate(
-                      provider.questions.length,
+                      provider.userAnswers.where((a) => a != null).length,
                       (index) => _buildDiscussionCard(context, provider, index),
                     ),
                     const SizedBox(height: 32),
@@ -79,40 +76,32 @@ class ResultScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildHeader(
-    BuildContext context,
-    int score,
-    int total,
-    double percentage,
-  ) {
+  Widget _buildHeader(BuildContext context, int correctAnswers, int total) {
+    Color cardColor = AppColors.primary;
+    String statusTitle = 'SELESAI!';
+    IconData iconData = Icons.emoji_events_rounded;
+
     return CustomCard(
-      color: AppColors.primary,
+      color: cardColor,
       child: Column(
         children: [
-          const Icon(Icons.stars_rounded, color: Colors.white, size: 60),
+          Icon(iconData, color: Colors.white, size: 60),
           const SizedBox(height: 16),
-          const Text(
-            'Skor Kamu',
-            style: TextStyle(color: Colors.white70, fontSize: 16),
-          ),
           Text(
-            score.toString(),
+            statusTitle,
+            textAlign: TextAlign.center,
             style: const TextStyle(
               color: Colors.white,
-              fontSize: 64,
+              fontSize: 24,
               fontWeight: FontWeight.bold,
             ),
           ),
+          const SizedBox(height: 16),
           Text(
-            'Dari $total Soal',
-            style: const TextStyle(color: Colors.white70, fontSize: 16),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            '${percentage.toInt()}% Benar',
+            'Benar $correctAnswers Dari $total Soal',
             style: const TextStyle(
-              color: AppColors.accent,
-              fontSize: 20,
+              color: Colors.white,
+              fontSize: 18,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -129,7 +118,15 @@ class ResultScreen extends StatelessWidget {
     final question = provider.questions[index];
     final userAnswer = provider.userAnswers[index];
     final isCorrect = userAnswer == question.correctAnswerIndex;
+    final isTimeout = userAnswer == -1;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    Color avatarColor = isCorrect
+        ? AppColors.success
+        : (isTimeout ? Colors.orange : AppColors.error);
+    IconData avatarIcon = isCorrect
+        ? Icons.check
+        : (isTimeout ? Icons.timer_off : Icons.close);
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 16.0),
@@ -142,15 +139,9 @@ class ResultScreen extends StatelessWidget {
             Row(
               children: [
                 CircleAvatar(
-                  backgroundColor: isCorrect
-                      ? AppColors.success
-                      : AppColors.error,
+                  backgroundColor: avatarColor,
                   radius: 14,
-                  child: Icon(
-                    isCorrect ? Icons.check : Icons.close,
-                    color: Colors.white,
-                    size: 16,
-                  ),
+                  child: Icon(avatarIcon, color: Colors.white, size: 16),
                 ),
                 const SizedBox(width: 12),
                 Text(
@@ -176,13 +167,12 @@ class ResultScreen extends StatelessWidget {
               ),
             ),
             Text(
-              userAnswer != null
-                  ? question.options[userAnswer]
-                  : 'Tidak dijawab',
-              style: TextStyle(
-                color: isCorrect ? AppColors.success : AppColors.error,
-                fontWeight: FontWeight.bold,
-              ),
+              isTimeout
+                  ? 'Habis Waktu'
+                  : (userAnswer != null
+                        ? question.options[userAnswer]
+                        : 'Tidak dijawab'),
+              style: TextStyle(color: avatarColor, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             Text(
