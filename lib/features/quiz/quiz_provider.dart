@@ -25,6 +25,7 @@ class QuizProvider extends ChangeNotifier {
   List<int?> get userAnswers => _userAnswers;
   bool get isCompleted => _isCompleted;
   bool get isProcessingFeedback => _isProcessingFeedback;
+  QuizType? get currentQuizType => _currentQuizType;
 
   Question get currentQuestion => _questions[_currentIndex];
   bool get isLastQuestion => _currentIndex == _questions.length - 1;
