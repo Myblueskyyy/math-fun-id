@@ -18,8 +18,6 @@ class ResultScreen extends StatelessWidget {
         final totalQuestions = provider.questions.length;
         final correctAnswers = provider.correctAnswersCount;
 
-        final isDark = Theme.of(context).brightness == Brightness.dark;
-
         return Scaffold(
           extendBodyBehindAppBar: true,
           backgroundColor: Colors.transparent,
@@ -44,7 +42,7 @@ class ResultScreen extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: isDark ? Colors.white : Colors.black,
+                          color: Colors.black,
                         ),
                       ),
                     ),
@@ -119,7 +117,6 @@ class ResultScreen extends StatelessWidget {
     final userAnswer = provider.userAnswers[index];
     final isCorrect = userAnswer == question.correctAnswerIndex;
     final isTimeout = userAnswer == -1;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     Color avatarColor = isCorrect
         ? AppColors.success
@@ -132,7 +129,7 @@ class ResultScreen extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 16.0),
       child: CustomCard(
         padding: 16,
-        color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+        color: Colors.white,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -148,23 +145,17 @@ class ResultScreen extends StatelessWidget {
                   'Soal ${index + 1}',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    color: isDark ? Colors.white : Colors.black,
+                    color: Colors.black,
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 12),
-            Text(
-              question.text,
-              style: TextStyle(color: isDark ? Colors.white70 : Colors.black87),
-            ),
-            Divider(height: 24, color: isDark ? Colors.white10 : null),
+            Text(question.text, style: const TextStyle(color: Colors.black87)),
+            const Divider(height: 24),
             Text(
               'Jawaban Kamu:',
-              style: TextStyle(
-                fontSize: 12,
-                color: isDark ? Colors.white38 : AppColors.textSecondary,
-              ),
+              style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
             ),
             Text(
               isTimeout
@@ -177,10 +168,7 @@ class ResultScreen extends StatelessWidget {
             const SizedBox(height: 8),
             Text(
               'Jawaban Benar:',
-              style: TextStyle(
-                fontSize: 12,
-                color: isDark ? Colors.white38 : AppColors.textSecondary,
-              ),
+              style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
             ),
             Text(
               question.options[question.correctAnswerIndex],
@@ -193,7 +181,7 @@ class ResultScreen extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: isDark ? Colors.black26 : Colors.grey.shade50,
+                color: Colors.grey.shade50,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Column(
@@ -204,7 +192,7 @@ class ResultScreen extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
-                      color: isDark ? Colors.white : Colors.black,
+                      color: Colors.black,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -213,7 +201,7 @@ class ResultScreen extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 14,
                       fontStyle: FontStyle.italic,
-                      color: isDark ? Colors.white70 : Colors.black87,
+                      color: Colors.black87,
                     ),
                   ),
                 ],

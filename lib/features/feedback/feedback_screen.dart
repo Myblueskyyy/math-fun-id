@@ -63,40 +63,33 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
   }
 
   Widget _buildFormState(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
+        const Text(
           'Bagaimana pengalaman belajarmu?',
           style: TextStyle(
             fontSize: 22,
             fontWeight: FontWeight.bold,
-            color: isDark ? Colors.white : AppColors.textPrimary,
+            color: AppColors.textPrimary,
           ),
         ),
         const SizedBox(height: 12),
-        Text(
+        const Text(
           'Berikan kesan, pesan, atau kendala yang kamu alami selama belajar Aritmatika Sosial menggunakan aplikasi ini.',
-          style: TextStyle(
-            fontSize: 16,
-            color: isDark ? Colors.white70 : AppColors.textSecondary,
-          ),
+          style: TextStyle(fontSize: 16, color: AppColors.textSecondary),
         ),
         const SizedBox(height: 32),
         CustomCard(
           padding: 16,
-          color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+          color: Colors.white,
           child: TextField(
             controller: _feedbackController,
             maxLines: 8,
-            style: TextStyle(color: isDark ? Colors.white : Colors.black),
-            decoration: InputDecoration(
+            style: const TextStyle(color: Colors.black),
+            decoration: const InputDecoration(
               hintText: 'Tuliskan di sini...',
-              hintStyle: TextStyle(
-                color: isDark ? Colors.white38 : Colors.grey,
-              ),
+              hintStyle: TextStyle(color: Colors.grey),
               border: InputBorder.none,
             ),
           ),
@@ -125,8 +118,6 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
   }
 
   Widget _buildSuccessState(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -137,22 +128,19 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
             size: 80,
           ),
           const SizedBox(height: 24),
-          Text(
+          const Text(
             'Terima Kasih!',
             style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
-              color: isDark ? Colors.white : Colors.black,
+              color: Colors.black,
             ),
           ),
           const SizedBox(height: 12),
-          Text(
+          const Text(
             'Masukanmu sangat berarti untuk pengembangan aplikasi ini kedepannya.',
             textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 16,
-              color: isDark ? Colors.white70 : AppColors.textSecondary,
-            ),
+            style: TextStyle(fontSize: 16, color: AppColors.textSecondary),
           ),
           const SizedBox(height: 48),
           BubblyButton(

@@ -5,13 +5,11 @@ class AppleAdditionIllustration extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return Container(
       padding: const EdgeInsets.all(20),
       margin: const EdgeInsets.only(bottom: 24),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF2C2C2C) : Colors.red.shade50,
+        color: Colors.red.shade50,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: Colors.red.shade200, width: 2),
       ),
@@ -27,7 +25,7 @@ class AppleAdditionIllustration extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: isDark ? Colors.white : Colors.red.shade900,
+                  color: Colors.red.shade900,
                 ),
               ),
             ],
@@ -36,15 +34,15 @@ class AppleAdditionIllustration extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              _buildItem(Icons.apple, Colors.red, '1 Apel', isDark),
+              _buildItem(Icons.apple, Colors.red, '1 Apel'),
               const Icon(Icons.add_circle, color: Colors.grey, size: 32),
-              _buildItem(Icons.apple, Colors.red, '1 Apel', isDark),
+              _buildItem(Icons.apple, Colors.red, '1 Apel'),
               const Icon(
                 Icons.pause,
                 color: Colors.grey,
                 size: 32,
               ), // Equal sign abstraction
-              _buildBasket(isDark),
+              _buildBasket(),
             ],
           ),
           const SizedBox(height: 20),
@@ -54,7 +52,7 @@ class AppleAdditionIllustration extends StatelessWidget {
             style: TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.w500,
-              color: isDark ? Colors.white70 : Colors.red.shade800,
+              color: Colors.red.shade800,
             ),
           ),
         ],
@@ -62,23 +60,23 @@ class AppleAdditionIllustration extends StatelessWidget {
     );
   }
 
-  Widget _buildItem(IconData icon, Color color, String label, bool isDark) {
+  Widget _buildItem(IconData icon, Color color, String label) {
     return Column(
       children: [
         Icon(icon, color: color, size: 48),
         const SizedBox(height: 8),
         Text(
           label,
-          style: TextStyle(
+          style: const TextStyle(
             fontWeight: FontWeight.bold,
-            color: isDark ? Colors.white : Colors.black87,
+            color: Colors.black87,
           ),
         ),
       ],
     );
   }
 
-  Widget _buildBasket(bool isDark) {
+  Widget _buildBasket() {
     return Column(
       children: [
         SizedBox(
@@ -106,12 +104,9 @@ class AppleAdditionIllustration extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 8),
-        Text(
+        const Text(
           '2 Apel',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: isDark ? Colors.white : Colors.black87,
-          ),
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black87),
         ),
       ],
     );

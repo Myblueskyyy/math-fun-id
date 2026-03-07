@@ -47,12 +47,11 @@ class VisualNovelGame extends FlameGame {
       }
       if (charLeftId != null && charLeftId.isNotEmpty) {
         final sprite = await loadSprite('$assetPrefix$charLeftId');
-        // Position at bottom left
-        final charSize = Vector2(size.x * 0.4, size.y * 0.7);
+        final charSize = _calculateCharSize(sprite, size);
         _characterLeft = SpriteComponent(
           sprite: sprite,
           size: charSize,
-          position: Vector2(size.x * 0.1, size.y - charSize.y),
+          position: Vector2(size.x * 0.05, size.y - charSize.y),
         );
         add(_characterLeft!);
       }
@@ -67,12 +66,11 @@ class VisualNovelGame extends FlameGame {
       }
       if (charRightId != null && charRightId.isNotEmpty) {
         final sprite = await loadSprite('$assetPrefix$charRightId');
-        // Position at bottom right
-        final charSize = Vector2(size.x * 0.4, size.y * 0.7);
+        final charSize = _calculateCharSize(sprite, size);
         _characterRight = SpriteComponent(
           sprite: sprite,
           size: charSize,
-          position: Vector2(size.x * 0.5, size.y - charSize.y),
+          position: Vector2(size.x * 0.95 - charSize.x, size.y - charSize.y),
         );
         add(_characterRight!);
       }
@@ -90,6 +88,20 @@ class VisualNovelGame extends FlameGame {
     }
   }
 
+  Vector2 _calculateCharSize(Sprite sprite, Vector2 gameSize) {
+    final aspectRatio = sprite.srcSize.x / sprite.srcSize.y;
+    double targetHeight = gameSize.y * 0.85; // Slightly taller for better focus
+    double targetWidth = targetHeight * aspectRatio;
+
+    // Constrain width to 45% of screen
+    if (targetWidth > gameSize.x * 0.45) {
+      targetWidth = gameSize.x * 0.45;
+      targetHeight = targetWidth / aspectRatio;
+    }
+
+    return Vector2(targetWidth, targetHeight);
+  }
+
   @override
   void onGameResize(Vector2 size) {
     super.onGameResize(size);
@@ -97,14 +109,18 @@ class VisualNovelGame extends FlameGame {
       _background!.size = size;
     }
 
-    final charSize = Vector2(size.x * 0.4, size.y * 0.7);
-    if (_characterLeft != null) {
-      _characterLeft!.size = charSize;
-      _characterLeft!.position = Vector2(size.x * 0.1, size.y - charSize.y);
+    if (_characterLeft != null && _characterLeft!.sprite != null) {
+      final newSize = _calculateCharSize(_characterLeft!.sprite!, size);
+      _characterLeft!.size = newSize;
+      _characterLeft!.position = Vector2(size.x * 0.05, size.y - newSize.y);
     }
-    if (_characterRight != null) {
-      _characterRight!.size = charSize;
-      _characterRight!.position = Vector2(size.x * 0.5, size.y - charSize.y);
+    if (_characterRight != null && _characterRight!.sprite != null) {
+      final newSize = _calculateCharSize(_characterRight!.sprite!, size);
+      _characterRight!.size = newSize;
+      _characterRight!.position = Vector2(
+        size.x * 0.95 - newSize.x,
+        size.y - newSize.y,
+      );
     }
   }
 }

@@ -5,6 +5,19 @@ class Choice {
   Choice({required this.text, required this.nextNodeId});
 }
 
+enum InteractionType {
+  none,
+  miniCalculator,
+  strategyCards,
+  reportTable,
+  statusCards,
+  priceLabel,
+  compareChallenge,
+  strukDigital,
+  numberSlider,
+  imageDisplay,
+}
+
 class StoryNode {
   final String id;
   final String dialogue;
@@ -14,6 +27,8 @@ class StoryNode {
   final String? characterRightId; // Key for the right character asset
   final List<Choice> choices;
   final String? nextNodeId; // Null if it has choices or is the end
+  final InteractionType interactionType;
+  final Map<String, dynamic>? interactionData;
 
   StoryNode({
     required this.id,
@@ -24,5 +39,7 @@ class StoryNode {
     this.characterRightId,
     this.choices = const [],
     this.nextNodeId,
+    this.interactionType = InteractionType.none,
+    this.interactionData,
   });
 }

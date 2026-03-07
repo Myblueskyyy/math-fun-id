@@ -109,8 +109,6 @@ class MateriListScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return Scaffold(
       extendBodyBehindAppBar: true,
       backgroundColor: Colors.transparent,
@@ -136,7 +134,7 @@ class MateriListScreen extends StatelessWidget {
                       builder: (_) => MateriDetailScreen(materi: materi),
                     ),
                   ),
-                  color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+                  color: Colors.white,
                   child: Row(
                     children: [
                       Container(
@@ -154,31 +152,27 @@ class MateriListScreen extends StatelessWidget {
                           children: [
                             Text(
                               materi.title,
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
-                                color: isDark
-                                    ? Colors.white
-                                    : AppColors.textPrimary,
+                                color: AppColors.textPrimary,
                               ),
                             ),
                             const SizedBox(height: 4),
                             Text(
                               materi.description,
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 14,
-                                color: isDark
-                                    ? Colors.white70
-                                    : AppColors.textSecondary,
+                                color: AppColors.textSecondary,
                               ),
                             ),
                           ],
                         ),
                       ),
-                      Icon(
+                      const Icon(
                         Icons.arrow_forward_ios_rounded,
                         size: 16,
-                        color: isDark ? Colors.white24 : Colors.grey,
+                        color: Colors.grey,
                       ),
                     ],
                   ),

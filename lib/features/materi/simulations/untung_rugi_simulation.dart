@@ -14,8 +14,6 @@ class _UntungRugiSimulationState extends State<UntungRugiSimulation> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     // Logic for weighing scale tilt
     double selisih = _hargaJual - _hargaBeli;
     double panRotation = 0.0; // rotation angle in radians
@@ -40,7 +38,7 @@ class _UntungRugiSimulationState extends State<UntungRugiSimulation> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+        color: Colors.white,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: Colors.green.withOpacity(0.3), width: 2),
         boxShadow: [
@@ -58,12 +56,12 @@ class _UntungRugiSimulationState extends State<UntungRugiSimulation> {
             children: [
               const Icon(Icons.balance_rounded, color: Colors.green, size: 28),
               const SizedBox(width: 8),
-              Text(
+              const Text(
                 'Timbangan Untung/Rugi',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: isDark ? Colors.white : AppColors.textPrimary,
+                  color: AppColors.textPrimary,
                 ),
               ),
             ],
@@ -109,13 +107,13 @@ class _UntungRugiSimulationState extends State<UntungRugiSimulation> {
                         Positioned(
                           left: -20,
                           top: 8,
-                          child: _buildPan('Beli', Colors.orange, isDark),
+                          child: _buildPan('Beli', Colors.orange),
                         ),
                         // Right Pan (Jual)
                         Positioned(
                           right: -20,
                           top: 8,
-                          child: _buildPan('Jual', Colors.blue, isDark),
+                          child: _buildPan('Jual', Colors.blue),
                         ),
                       ],
                     ),
@@ -154,7 +152,6 @@ class _UntungRugiSimulationState extends State<UntungRugiSimulation> {
             'Harga Beli: Rp ${_hargaBeli.toStringAsFixed(0)}',
             _hargaBeli,
             Colors.orange,
-            isDark,
             (val) => setState(() => _hargaBeli = val),
           ),
           const SizedBox(height: 12),
@@ -162,7 +159,6 @@ class _UntungRugiSimulationState extends State<UntungRugiSimulation> {
             'Harga Jual: Rp ${_hargaJual.toStringAsFixed(0)}',
             _hargaJual,
             Colors.blue,
-            isDark,
             (val) => setState(() => _hargaJual = val),
           ),
         ],
@@ -170,7 +166,7 @@ class _UntungRugiSimulationState extends State<UntungRugiSimulation> {
     );
   }
 
-  Widget _buildPan(String label, Color color, bool isDark) {
+  Widget _buildPan(String label, Color color) {
     return Column(
       children: [
         // Ropes
@@ -217,7 +213,6 @@ class _UntungRugiSimulationState extends State<UntungRugiSimulation> {
     String label,
     double value,
     Color color,
-    bool isDark,
     ValueChanged<double> onChanged,
   ) {
     return Column(
@@ -225,9 +220,9 @@ class _UntungRugiSimulationState extends State<UntungRugiSimulation> {
       children: [
         Text(
           label,
-          style: TextStyle(
+          style: const TextStyle(
             fontWeight: FontWeight.bold,
-            color: isDark ? Colors.white : AppColors.textPrimary,
+            color: AppColors.textPrimary,
           ),
         ),
         Slider(

@@ -44,48 +44,4 @@ class AppTheme {
       ),
     );
   }
-
-  static ThemeData get darkTheme {
-    return ThemeData(
-      useMaterial3: true,
-      brightness: Brightness.dark,
-      colorScheme: ColorScheme.fromSeed(
-        seedColor: AppColors.primary,
-        brightness: Brightness.dark,
-        primary: AppColors.primary,
-        secondary: AppColors.secondary,
-        surface: const Color(0xFF1E1E1E),
-        error: AppColors.error,
-        onPrimary: Colors.white,
-        onSecondary: Colors.white,
-      ),
-      scaffoldBackgroundColor: const Color(0xFF121212),
-      textTheme: GoogleFonts.poppinsTextTheme(ThemeData.dark().textTheme)
-          .copyWith(
-            displayLarge: GoogleFonts.poppins(
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-            titleLarge: GoogleFonts.poppins(
-              fontWeight: FontWeight.w600,
-              color: Colors.white,
-            ),
-          ),
-      elevatedButtonTheme: ElevatedButtonThemeData(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primary,
-          foregroundColor: Colors.white,
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-        ),
-      ),
-      cardTheme: CardThemeData(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        elevation: 2,
-        color: const Color(0xFF1E1E1E),
-      ),
-    );
-  }
 }

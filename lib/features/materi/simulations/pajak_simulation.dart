@@ -54,15 +54,13 @@ class _PajakSimulationState extends State<PajakSimulation>
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     final pajakAmount = _includePajak ? _hargaBarang * 0.11 : 0.0; // PPN 11%
     final totalBayar = _hargaBarang + pajakAmount;
 
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+        color: Colors.white,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: Colors.red.withOpacity(0.3), width: 2),
         boxShadow: [
@@ -76,32 +74,25 @@ class _PajakSimulationState extends State<PajakSimulation>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Row(
+          const Row(
             children: [
-              const Icon(
-                Icons.receipt_long_rounded,
-                color: Colors.red,
-                size: 28,
-              ),
-              const SizedBox(width: 8),
+              Icon(Icons.receipt_long_rounded, color: Colors.red, size: 28),
+              SizedBox(width: 8),
               Text(
                 'Simulasi Kasir (Pajak PPN 11%)',
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
-                  color: isDark ? Colors.white : AppColors.textPrimary,
+                  color: AppColors.textPrimary,
                 ),
               ),
             ],
           ),
           const SizedBox(height: 20),
 
-          Text(
+          const Text(
             'Harga Makanan/Barang:',
-            style: TextStyle(
-              color: isDark ? Colors.white70 : AppColors.textSecondary,
-              fontSize: 14,
-            ),
+            style: TextStyle(color: AppColors.textSecondary, fontSize: 14),
           ),
           Slider(
             value: _hargaBarang,
@@ -118,10 +109,10 @@ class _PajakSimulationState extends State<PajakSimulation>
           Text(
             'Rp ${_hargaBarang.toStringAsFixed(0)}',
             textAlign: TextAlign.center,
-            style: TextStyle(
+            style: const TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 18,
-              color: isDark ? Colors.white : AppColors.textPrimary,
+              color: AppColors.textPrimary,
             ),
           ),
 
@@ -144,7 +135,7 @@ class _PajakSimulationState extends State<PajakSimulation>
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF2C2C2C) : Colors.grey.shade100,
+              color: Colors.grey.shade100,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
                 color: Colors.grey.shade300,
@@ -155,31 +146,21 @@ class _PajakSimulationState extends State<PajakSimulation>
               children: [
                 Column(
                   children: [
-                    Text(
+                    const Text(
                       'Struk Belanja',
                       style: TextStyle(
                         fontFamily: 'Courier',
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
-                        color: isDark ? Colors.white70 : AppColors.textPrimary,
+                        color: AppColors.textPrimary,
                       ),
                     ),
                     const Divider(color: Colors.grey, thickness: 1, height: 24),
-                    _buildReceiptRow('Harga Awal', _hargaBarang, isDark),
+                    _buildReceiptRow('Harga Awal', _hargaBarang),
                     if (_includePajak)
-                      _buildReceiptRow(
-                        'PPN (11%)',
-                        pajakAmount,
-                        isDark,
-                        isTax: true,
-                      ),
+                      _buildReceiptRow('PPN (11%)', pajakAmount, isTax: true),
                     const Divider(color: Colors.grey, thickness: 1, height: 24),
-                    _buildReceiptRow(
-                      'TOTAL',
-                      totalBayar,
-                      isDark,
-                      isTotal: true,
-                    ),
+                    _buildReceiptRow('TOTAL', totalBayar, isTotal: true),
                   ],
                 ),
 
@@ -235,8 +216,7 @@ class _PajakSimulationState extends State<PajakSimulation>
 
   Widget _buildReceiptRow(
     String label,
-    double amount,
-    bool isDark, {
+    double amount, {
     bool isTotal = false,
     bool isTax = false,
   }) {
@@ -251,9 +231,7 @@ class _PajakSimulationState extends State<PajakSimulation>
               fontFamily: 'Courier',
               fontWeight: isTotal ? FontWeight.bold : FontWeight.normal,
               fontSize: isTotal ? 18 : 14,
-              color: isTax
-                  ? Colors.red
-                  : (isDark ? Colors.white : AppColors.textPrimary),
+              color: isTax ? Colors.red : AppColors.textPrimary,
             ),
           ),
           Text(
@@ -262,9 +240,7 @@ class _PajakSimulationState extends State<PajakSimulation>
               fontFamily: 'Courier',
               fontWeight: isTotal ? FontWeight.bold : FontWeight.normal,
               fontSize: isTotal ? 18 : 14,
-              color: isTax
-                  ? Colors.red
-                  : (isDark ? Colors.white : AppColors.textPrimary),
+              color: isTax ? Colors.red : AppColors.textPrimary,
             ),
           ),
         ],

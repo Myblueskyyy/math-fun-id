@@ -20,11 +20,10 @@ class MateriDetailScreen extends StatefulWidget {
 class _MateriDetailScreenState extends State<MateriDetailScreen> {
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    return _buildScaffold(context, isDark);
+    return _buildScaffold(context);
   }
 
-  Widget _buildScaffold(BuildContext context, bool isDark) {
+  Widget _buildScaffold(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: BubblyBackground(
@@ -42,15 +41,33 @@ class _MateriDetailScreenState extends State<MateriDetailScreen> {
                     color: Colors.white,
                   ),
                 ),
-                background: Container(color: widget.materi.color),
+                background: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    Image.asset(
+                      "assets/images/bg-appbar.png",
+                      fit: BoxFit.cover,
+                    ),
+                    Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Colors.transparent,
+                            widget.materi.color.withOpacity(0.8),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
             SliverPadding(
               padding: const EdgeInsets.all(24.0),
               sliver: SliverList(
-                delegate: SliverChildListDelegate([
-                  ..._buildContent(context, isDark),
-                ]),
+                delegate: SliverChildListDelegate([..._buildContent(context)]),
               ),
             ),
           ],
@@ -59,23 +76,23 @@ class _MateriDetailScreenState extends State<MateriDetailScreen> {
     );
   }
 
-  List<Widget> _buildContent(BuildContext context, bool isDark) {
+  List<Widget> _buildContent(BuildContext context) {
     return [
-      Text(
+      const Text(
         'Konsep Dasar',
         style: TextStyle(
           fontSize: 18,
           fontWeight: FontWeight.bold,
-          color: isDark ? Colors.white : AppColors.textPrimary,
+          color: AppColors.surface,
         ),
       ),
       const SizedBox(height: 12),
       Text(
         widget.materi.content,
-        style: TextStyle(
+        style: const TextStyle(
           fontSize: 16,
           height: 1.6,
-          color: isDark ? Colors.white70 : AppColors.textPrimary,
+          color: AppColors.surface,
         ),
       ),
       const SizedBox(height: 24),
@@ -111,12 +128,12 @@ class _MateriDetailScreenState extends State<MateriDetailScreen> {
 
       // 3. Case Study
       if (widget.materi.caseStudy != null) ...[
-        Text(
+        const Text(
           'Studi Kasus di Kehidupan Nyata',
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
-            color: isDark ? Colors.white : AppColors.textPrimary,
+            color: AppColors.surface,
           ),
         ),
         const SizedBox(height: 12),
@@ -124,7 +141,7 @@ class _MateriDetailScreenState extends State<MateriDetailScreen> {
           padding: const EdgeInsets.all(16),
           margin: const EdgeInsets.only(bottom: 24),
           decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF1E1E1E) : Colors.amber.shade50,
+            color: Colors.amber.shade50,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(color: Colors.amber.shade200),
           ),
@@ -140,11 +157,11 @@ class _MateriDetailScreenState extends State<MateriDetailScreen> {
               Expanded(
                 child: Text(
                   widget.materi.caseStudy!,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 15,
                     height: 1.5,
                     fontStyle: FontStyle.italic,
-                    color: isDark ? Colors.white70 : Colors.black87,
+                    color: Colors.black87,
                   ),
                 ),
               ),
@@ -156,12 +173,12 @@ class _MateriDetailScreenState extends State<MateriDetailScreen> {
       // 4. Interactive Simulation
       if (widget.materi.interactiveWidget != null) ...[
         const SizedBox(height: 8),
-        Text(
+        const Text(
           'Simulasi Interaktif',
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
-            color: isDark ? Colors.white : AppColors.textPrimary,
+            color: AppColors.surface,
           ),
         ),
         const SizedBox(height: 16),
@@ -170,12 +187,12 @@ class _MateriDetailScreenState extends State<MateriDetailScreen> {
 
       const SizedBox(height: 32),
 
-      Text(
+      const Text(
         'Rumus Utama',
         style: TextStyle(
           fontSize: 18,
           fontWeight: FontWeight.bold,
-          color: isDark ? Colors.white : AppColors.textPrimary,
+          color: AppColors.surface,
         ),
       ),
       const SizedBox(height: 12),
@@ -183,12 +200,12 @@ class _MateriDetailScreenState extends State<MateriDetailScreen> {
         (entry) => _buildFormulaRow(context, entry.key, entry.value),
       ),
       const SizedBox(height: 32),
-      Text(
+      const Text(
         'Contoh Soal',
         style: TextStyle(
           fontSize: 18,
           fontWeight: FontWeight.bold,
-          color: isDark ? Colors.white : AppColors.textPrimary,
+          color: AppColors.surface,
         ),
       ),
       const SizedBox(height: 16),
@@ -198,27 +215,23 @@ class _MateriDetailScreenState extends State<MateriDetailScreen> {
   }
 
   Widget _buildFormulaRow(BuildContext context, String label, String formula) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return Padding(
       padding: const EdgeInsets.only(bottom: 12.0),
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+          color: Colors.white,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: isDark ? Colors.white10 : Colors.grey.shade200,
-          ),
+          border: Border.all(color: Colors.grey.shade200),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               label,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 12,
-                color: isDark ? Colors.white54 : AppColors.textSecondary,
+                color: AppColors.textSecondary,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -238,28 +251,26 @@ class _MateriDetailScreenState extends State<MateriDetailScreen> {
   }
 
   Widget _buildExampleCard(BuildContext context, ExampleQuestion ex) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return Padding(
       padding: const EdgeInsets.only(bottom: 16.0),
       child: CustomCard(
-        color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+        color: Colors.white,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
+            const Row(
               children: [
-                const Icon(
+                Icon(
                   Icons.help_outline_rounded,
                   color: AppColors.primary,
                   size: 20,
                 ),
-                const SizedBox(width: 8),
+                SizedBox(width: 8),
                 Text(
                   'Soal',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    color: isDark ? Colors.white : AppColors.textPrimary,
+                    color: AppColors.textPrimary,
                   ),
                 ),
               ],
@@ -267,25 +278,25 @@ class _MateriDetailScreenState extends State<MateriDetailScreen> {
             const SizedBox(height: 8),
             Text(
               ex.question,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 15,
-                color: isDark ? Colors.white : AppColors.textPrimary,
+                color: AppColors.textPrimary,
               ),
             ),
-            Divider(height: 24, color: isDark ? Colors.white10 : null),
-            Row(
+            const Divider(height: 24),
+            const Row(
               children: [
-                const Icon(
+                Icon(
                   Icons.lightbulb_outline_rounded,
                   color: Colors.orange,
                   size: 20,
                 ),
-                const SizedBox(width: 8),
+                SizedBox(width: 8),
                 Text(
                   'Penyelesaian',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    color: isDark ? Colors.white : AppColors.textPrimary,
+                    color: AppColors.textPrimary,
                   ),
                 ),
               ],
@@ -293,10 +304,10 @@ class _MateriDetailScreenState extends State<MateriDetailScreen> {
             const SizedBox(height: 8),
             Text(
               ex.solution,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 15,
                 fontStyle: FontStyle.italic,
-                color: isDark ? Colors.white70 : AppColors.textSecondary,
+                color: AppColors.textSecondary,
               ),
             ),
           ],

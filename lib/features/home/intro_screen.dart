@@ -9,7 +9,7 @@ class IntroScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final objectives = [
+    const objectives = [
       'Memahami konsep harga beli dan harga jual',
       'Menghitung keuntungan dan kerugian beserta persentasenya',
       'Menghitung besar diskon dan harga setelah diskon',
@@ -17,13 +17,14 @@ class IntroScreen extends StatelessWidget {
       'Menyelesaikan masalah kontekstual aritmatika sosial',
     ];
 
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return Scaffold(
       extendBodyBehindAppBar: true,
       backgroundColor: Colors.transparent,
       appBar: AppBar(
-        title: const Text(AppStrings.menuPendahuluan),
+        title: Text(
+          AppStrings.menuPendahuluan,
+          style: TextStyle(color: AppColors.surface),
+        ),
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
@@ -44,35 +45,35 @@ class IntroScreen extends StatelessWidget {
                     child: const Icon(
                       Icons.auto_awesome_rounded,
                       size: 60,
-                      color: AppColors.primary,
+                      color: AppColors.surface,
                     ),
                   ),
                 ),
                 const SizedBox(height: 32),
-                Text(
+                const Text(
                   'Selamat Datang di Math Fun!',
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
-                    color: isDark ? Colors.white : AppColors.textPrimary,
+                    color: AppColors.surface,
                   ),
                 ),
                 const SizedBox(height: 12),
-                Text(
+                const Text(
                   'Aplikasi ini dirancang untuk membantumu memahami materi Aritmatika Sosial dengan cara yang seru dan interaktif.',
                   style: TextStyle(
                     fontSize: 16,
-                    color: isDark ? Colors.white70 : AppColors.textSecondary,
+                    color: AppColors.surface,
                     height: 1.5,
                   ),
                 ),
                 const SizedBox(height: 32),
-                Text(
+                const Text(
                   'Tujuan Pembelajaran:',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: isDark ? Colors.white : AppColors.textPrimary,
+                    color: AppColors.surface,
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -91,11 +92,9 @@ class IntroScreen extends StatelessWidget {
                         Expanded(
                           child: Text(
                             obj,
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 15,
-                              color: isDark
-                                  ? Colors.white
-                                  : AppColors.textPrimary,
+                              color: AppColors.surface,
                             ),
                           ),
                         ),

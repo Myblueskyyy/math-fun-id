@@ -170,20 +170,19 @@ class EvaluasiScreen extends StatelessWidget {
     required int total,
     required IconData icon,
   }) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     return CustomCard(
       padding: 16,
-      color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+      color: Colors.white,
       child: Column(
         children: [
           Icon(icon, size: 36, color: AppColors.primary),
           const SizedBox(height: 12),
           Text(
             title,
-            style: TextStyle(
+            style: const TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 18,
-              color: isDark ? Colors.white : Colors.black,
+              color: Colors.black,
             ),
           ),
           const SizedBox(height: 8),
@@ -195,12 +194,9 @@ class EvaluasiScreen extends StatelessWidget {
               color: AppColors.primary,
             ),
           ),
-          Text(
+          const Text(
             'Jawaban Benar',
-            style: TextStyle(
-              fontSize: 12,
-              color: isDark ? Colors.white70 : Colors.black54,
-            ),
+            style: TextStyle(fontSize: 12, color: Colors.black54),
           ),
         ],
       ),

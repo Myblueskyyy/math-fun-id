@@ -14,15 +14,13 @@ class _DiskonSimulationState extends State<DiskonSimulation> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     final diskonAmount = _hargaAwal * (_diskonPercent / 100);
     final hargaAkhir = _hargaAwal - diskonAmount;
 
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+        color: Colors.white,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: Colors.orange.withOpacity(0.3), width: 2),
         boxShadow: [
@@ -36,20 +34,16 @@ class _DiskonSimulationState extends State<DiskonSimulation> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Row(
+          const Row(
             children: [
-              const Icon(
-                Icons.local_offer_rounded,
-                color: Colors.orange,
-                size: 28,
-              ),
-              const SizedBox(width: 8),
+              Icon(Icons.local_offer_rounded, color: Colors.orange, size: 28),
+              SizedBox(width: 8),
               Text(
                 'Simulasi Diskon',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: isDark ? Colors.white : AppColors.textPrimary,
+                  color: AppColors.textPrimary,
                 ),
               ),
             ],
@@ -65,18 +59,13 @@ class _DiskonSimulationState extends State<DiskonSimulation> {
                 'Harga Awal',
                 _hargaAwal,
                 Colors.grey,
-                isDark,
                 strikethrough: _diskonPercent > 0,
               ),
-              Icon(
-                Icons.arrow_forward_rounded,
-                color: isDark ? Colors.white54 : Colors.grey,
-              ),
+              const Icon(Icons.arrow_forward_rounded, color: Colors.grey),
               _buildPriceBox(
                 'Harga Akhir',
                 hargaAkhir,
                 Colors.orange,
-                isDark,
                 isHighlight: true,
               ),
             ],
@@ -87,9 +76,9 @@ class _DiskonSimulationState extends State<DiskonSimulation> {
           // Interactive Controls
           Text(
             'Atur Harga Awal: Rp ${_hargaAwal.toStringAsFixed(0)}',
-            style: TextStyle(
+            style: const TextStyle(
               fontWeight: FontWeight.bold,
-              color: isDark ? Colors.white : AppColors.textPrimary,
+              color: AppColors.textPrimary,
             ),
           ),
           Slider(
@@ -110,11 +99,11 @@ class _DiskonSimulationState extends State<DiskonSimulation> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
+              const Text(
                 'Tarik Diskon:',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  color: isDark ? Colors.white : AppColors.textPrimary,
+                  color: AppColors.textPrimary,
                 ),
               ),
               Container(
@@ -185,8 +174,7 @@ class _DiskonSimulationState extends State<DiskonSimulation> {
   Widget _buildPriceBox(
     String label,
     double price,
-    Color color,
-    bool isDark, {
+    Color color, {
     bool strikethrough = false,
     bool isHighlight = false,
   }) {
@@ -194,18 +182,13 @@ class _DiskonSimulationState extends State<DiskonSimulation> {
       children: [
         Text(
           label,
-          style: TextStyle(
-            fontSize: 12,
-            color: isDark ? Colors.white54 : AppColors.textSecondary,
-          ),
+          style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
         ),
         const SizedBox(height: 8),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           decoration: BoxDecoration(
-            color: isHighlight
-                ? color.withOpacity(0.1)
-                : (isDark ? const Color(0xFF2C2C2C) : Colors.grey.shade100),
+            color: isHighlight ? color.withOpacity(0.1) : Colors.grey.shade100,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
               color: isHighlight ? color : Colors.transparent,
@@ -221,10 +204,8 @@ class _DiskonSimulationState extends State<DiskonSimulation> {
                   ? TextDecoration.lineThrough
                   : TextDecoration.none,
               color: strikethrough
-                  ? (isDark ? Colors.white38 : Colors.grey)
-                  : (isHighlight
-                        ? color
-                        : (isDark ? Colors.white : AppColors.textPrimary)),
+                  ? Colors.grey
+                  : (isHighlight ? color : AppColors.textPrimary),
             ),
           ),
         ),

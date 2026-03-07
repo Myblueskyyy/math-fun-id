@@ -5,13 +5,11 @@ class MarketVisualIllustration extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return Container(
       padding: const EdgeInsets.all(20),
       margin: const EdgeInsets.only(bottom: 24),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF2C2C2C) : Colors.blue.shade50,
+        color: Colors.blue.shade50,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: Colors.blue.shade200, width: 2),
       ),
@@ -31,7 +29,7 @@ class MarketVisualIllustration extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: isDark ? Colors.white : Colors.blue.shade900,
+                  color: Colors.blue.shade900,
                 ),
               ),
             ],
@@ -44,7 +42,6 @@ class MarketVisualIllustration extends StatelessWidget {
                 Icons.person_outline_rounded,
                 'Pedagang',
                 Colors.orange,
-                isDark,
                 'Beli: Rp10rb',
               ),
               Expanded(
@@ -68,9 +65,7 @@ class MarketVisualIllustration extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
-                        color: isDark
-                            ? Colors.blue.shade200
-                            : Colors.blue.shade700,
+                        color: Colors.blue.shade700,
                       ),
                     ),
                   ],
@@ -80,7 +75,6 @@ class MarketVisualIllustration extends StatelessWidget {
                 Icons.face_rounded,
                 'Pembeli',
                 Colors.green,
-                isDark,
                 'Bayar: Rp12rb',
               ),
             ],
@@ -89,10 +83,7 @@ class MarketVisualIllustration extends StatelessWidget {
           Text(
             'Pedagang awalnya mengeluarkan modal Rp10.000 (Harga Beli) untuk buku tersebut. Lalu, pembeli membayar Rp12.000 (Harga Jual) untuk mendapatkannya.',
             textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 14,
-              color: isDark ? Colors.white70 : Colors.blue.shade900,
-            ),
+            style: TextStyle(fontSize: 14, color: Colors.blue.shade900),
           ),
         ],
       ),
@@ -103,7 +94,6 @@ class MarketVisualIllustration extends StatelessWidget {
     IconData icon,
     String role,
     Color color,
-    bool isDark,
     String actionText,
   ) {
     return Column(
@@ -116,9 +106,9 @@ class MarketVisualIllustration extends StatelessWidget {
         const SizedBox(height: 8),
         Text(
           role,
-          style: TextStyle(
+          style: const TextStyle(
             fontWeight: FontWeight.bold,
-            color: isDark ? Colors.white : Colors.black87,
+            color: Colors.black87,
           ),
         ),
         const SizedBox(height: 4),

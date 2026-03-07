@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/widgets/bubbly_background.dart';
+import '../../core/utils/device_utils.dart';
 import '../../shared/widgets/custom_card.dart';
 import 'quiz_provider.dart';
 import 'result_screen.dart';
@@ -22,10 +23,15 @@ class _QuizScreenState extends State<QuizScreen> {
   @override
   void initState() {
     super.initState();
-    // Add post frame callback to safely add the listener
+    // Add post frame callback to safely add the listener and check orientation
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _provider = context.read<QuizProvider>();
       _provider?.addListener(_onProviderUpdate);
+
+      // Force portrait if on phone
+      if (DeviceUtils.isPhone(context)) {
+        DeviceUtils.forcePortrait();
+      }
     });
   }
 
@@ -43,6 +49,8 @@ class _QuizScreenState extends State<QuizScreen> {
   @override
   void dispose() {
     _provider?.removeListener(_onProviderUpdate);
+    // Reset orientation to default (landscape) when leaving quiz
+    DeviceUtils.resetToDefault();
     super.dispose();
   }
 
@@ -53,7 +61,6 @@ class _QuizScreenState extends State<QuizScreen> {
         if (provider.questions.isEmpty) return const SizedBox.shrink();
 
         final question = provider.currentQuestion;
-        final isDark = Theme.of(context).brightness == Brightness.dark;
 
         return Scaffold(
           extendBodyBehindAppBar: true,
@@ -99,18 +106,14 @@ class _QuizScreenState extends State<QuizScreen> {
                               children: [
                                 CustomCard(
                                   padding: 24,
-                                  color: isDark
-                                      ? const Color(0xFF1E1E1E)
-                                      : Colors.white,
+                                  color: Colors.white,
                                   child: Text(
                                     question.text,
                                     style: TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.w600,
                                       height: 1.5,
-                                      color: isDark
-                                          ? Colors.white
-                                          : AppColors.textPrimary,
+                                      color: AppColors.textPrimary,
                                     ),
                                   ),
                                 ),
@@ -244,10 +247,8 @@ class _QuizScreenState extends State<QuizScreen> {
     bool showCorrect = userAnswer != null && isCorrectOption;
     bool showWrong = userAnswer != null && isSelected && !isCorrectOption;
 
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     Color borderColor = Colors.transparent;
-    Color bgColor = isDark ? const Color(0xFF1E1E1E) : Colors.white;
+    Color bgColor = Colors.white;
 
     if (showCorrect) {
       borderColor = Colors.green;
@@ -256,11 +257,11 @@ class _QuizScreenState extends State<QuizScreen> {
       borderColor = Colors.redAccent;
       bgColor = Colors.redAccent.withOpacity(0.1);
     } else if (userAnswer == null) {
-      borderColor = isDark ? Colors.white10 : Colors.grey.shade200;
+      borderColor = Colors.grey.shade200;
     } else {
       // Dim other options when an answer is selected
-      borderColor = isDark ? Colors.white10 : Colors.grey.shade200;
-      bgColor = isDark ? Colors.grey.shade900 : Colors.grey.shade100;
+      borderColor = Colors.grey.shade200;
+      bgColor = Colors.grey.shade100;
     }
 
     return Padding(
@@ -285,11 +286,9 @@ class _QuizScreenState extends State<QuizScreen> {
                 width: 30,
                 height: 30,
                 decoration: BoxDecoration(
-                  color: showCorrect
-                      ? Colors.green
-                      : showWrong
-                      ? Colors.redAccent
-                      : (isDark ? Colors.white12 : Colors.grey.shade200),
+                  color: (showCorrect || showWrong)
+                      ? Colors.white
+                      : Colors.grey.shade200,
                   shape: BoxShape.circle,
                 ),
                 child: Center(
@@ -298,7 +297,7 @@ class _QuizScreenState extends State<QuizScreen> {
                     style: TextStyle(
                       color: (showCorrect || showWrong)
                           ? Colors.white
-                          : (isDark ? Colors.white70 : AppColors.textSecondary),
+                          : AppColors.textSecondary,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -315,7 +314,7 @@ class _QuizScreenState extends State<QuizScreen> {
                         : FontWeight.normal,
                     color: (showCorrect || showWrong)
                         ? borderColor
-                        : (isDark ? Colors.white : AppColors.textPrimary),
+                        : AppColors.textPrimary,
                   ),
                 ),
               ),

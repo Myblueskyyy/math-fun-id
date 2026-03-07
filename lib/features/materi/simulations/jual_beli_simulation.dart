@@ -67,12 +67,10 @@ class _JualBeliSimulationState extends State<JualBeliSimulation>
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+        color: Colors.white,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: Colors.blue.withOpacity(0.3), width: 2),
         boxShadow: [
@@ -86,20 +84,16 @@ class _JualBeliSimulationState extends State<JualBeliSimulation>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Row(
+          const Row(
             children: [
-              const Icon(
-                Icons.storefront_rounded,
-                color: Colors.blue,
-                size: 28,
-              ),
-              const SizedBox(width: 8),
+              Icon(Icons.storefront_rounded, color: Colors.blue, size: 28),
+              SizedBox(width: 8),
               Text(
                 'Simulasi Pasar',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: isDark ? Colors.white : AppColors.textPrimary,
+                  color: AppColors.textPrimary,
                 ),
               ),
             ],
@@ -113,7 +107,6 @@ class _JualBeliSimulationState extends State<JualBeliSimulation>
                   label: 'Harga Beli (Rp)',
                   icon: Icons.shopping_cart_checkout_rounded,
                   color: Colors.orange,
-                  isDark: isDark,
                 ),
               ),
               const SizedBox(width: 12),
@@ -123,7 +116,6 @@ class _JualBeliSimulationState extends State<JualBeliSimulation>
                   label: 'Harga Jual (Rp)',
                   icon: Icons.sell_rounded,
                   color: Colors.green,
-                  isDark: isDark,
                 ),
               ),
             ],
@@ -151,7 +143,7 @@ class _JualBeliSimulationState extends State<JualBeliSimulation>
               opacity: _fadeAnimation,
               child: ScaleTransition(
                 scale: _scaleAnimation,
-                child: _buildResult(isDark),
+                child: _buildResult(),
               ),
             ),
           ],
@@ -165,36 +157,31 @@ class _JualBeliSimulationState extends State<JualBeliSimulation>
     required String label,
     required IconData icon,
     required Color color,
-    required bool isDark,
   }) {
     return TextField(
       controller: controller,
       keyboardType: TextInputType.number,
       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-      style: TextStyle(
+      style: const TextStyle(
         fontWeight: FontWeight.bold,
-        color: isDark ? Colors.white : AppColors.textPrimary,
+        color: AppColors.textPrimary,
       ),
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: TextStyle(
-          color: isDark ? Colors.white54 : AppColors.textSecondary,
+        labelStyle: const TextStyle(
+          color: AppColors.textSecondary,
           fontWeight: FontWeight.normal,
         ),
         prefixIcon: Icon(icon, color: color),
         filled: true,
-        fillColor: isDark ? const Color(0xFF2C2C2C) : Colors.grey.shade50,
+        fillColor: Colors.grey.shade50,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(
-            color: isDark ? Colors.white10 : Colors.grey.shade300,
-          ),
+          borderSide: BorderSide(color: Colors.grey.shade300),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(
-            color: isDark ? Colors.white10 : Colors.grey.shade300,
-          ),
+          borderSide: BorderSide(color: Colors.grey.shade300),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
@@ -204,7 +191,7 @@ class _JualBeliSimulationState extends State<JualBeliSimulation>
     );
   }
 
-  Widget _buildResult(bool isDark) {
+  Widget _buildResult() {
     final status = _hargaJual! > _hargaBeli!
         ? 'Untung'
         : _hargaJual! < _hargaBeli!
@@ -259,10 +246,10 @@ class _JualBeliSimulationState extends State<JualBeliSimulation>
                   if (selisih > 0)
                     Text(
                       'Rp ${selisih.toStringAsFixed(0)}',
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w900,
-                        color: isDark ? Colors.white : AppColors.textPrimary,
+                        color: AppColors.textPrimary,
                       ),
                     ),
                 ],
@@ -273,10 +260,10 @@ class _JualBeliSimulationState extends State<JualBeliSimulation>
           Text(
             message,
             textAlign: TextAlign.center,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 14,
               fontStyle: FontStyle.italic,
-              color: isDark ? Colors.white70 : AppColors.textSecondary,
+              color: AppColors.textSecondary,
             ),
           ),
         ],

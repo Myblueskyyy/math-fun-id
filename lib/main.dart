@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'core/theme/app_theme.dart';
-import 'features/home/welcome_screen.dart';
+import 'features/home/splash_screen.dart';
 import 'features/quiz/quiz_provider.dart';
 
 void main() async {
@@ -29,7 +29,8 @@ class MathFunApp extends StatelessWidget {
       title: 'Math Fun',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
-      home: const WelcomeScreen(),
+      themeMode: ThemeMode.light,
+      home: const SplashScreen(),
     );
   }
 }
