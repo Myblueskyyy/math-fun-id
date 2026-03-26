@@ -138,10 +138,36 @@ class _QuizScreenState extends State<QuizScreen> {
                 Positioned(
                   right: 20,
                   bottom: 20,
-                  child: Transform.flip(
-                    flipX: true,
+                  child: FloatingCharacter(
+                    child: Transform.flip(
+                      flipX: true,
+                      child: Image.asset(
+                        'assets/images/anis.png',
+                        height: 300,
+                        errorBuilder: (context, error, stackTrace) => Column(
+                          children: [
+                            Icon(
+                              Icons.person_outline_rounded,
+                              size: 100,
+                              color: AppColors.primary.withOpacity(0.5),
+                            ),
+                            const Text(
+                              'Anis Placeholder',
+                              style: TextStyle(color: Colors.white70),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              if (provider.currentQuizType == QuizType.postTest)
+                Positioned(
+                  right: 20,
+                  bottom: 20,
+                  child: FloatingCharacter(
                     child: Image.asset(
-                      'assets/images/anis.png',
+                      'assets/images/angga.png',
                       height: 300,
                       errorBuilder: (context, error, stackTrace) => Column(
                         children: [
@@ -151,33 +177,11 @@ class _QuizScreenState extends State<QuizScreen> {
                             color: AppColors.primary.withOpacity(0.5),
                           ),
                           const Text(
-                            'Anis Placeholder',
+                            'Angga Placeholder',
                             style: TextStyle(color: Colors.white70),
                           ),
                         ],
                       ),
-                    ),
-                  ),
-                ),
-              if (provider.currentQuizType == QuizType.postTest)
-                Positioned(
-                  right: 20,
-                  bottom: 20,
-                  child: Image.asset(
-                    'assets/images/angga.png',
-                    height: 300,
-                    errorBuilder: (context, error, stackTrace) => Column(
-                      children: [
-                        Icon(
-                          Icons.person_outline_rounded,
-                          size: 100,
-                          color: AppColors.primary.withOpacity(0.5),
-                        ),
-                        const Text(
-                          'Angga Placeholder',
-                          style: TextStyle(color: Colors.white70),
-                        ),
-                      ],
                     ),
                   ),
                 ),
@@ -326,6 +330,52 @@ class _QuizScreenState extends State<QuizScreen> {
           ),
         ),
       ),
+    );
+  }
+}
+
+class FloatingCharacter extends StatefulWidget {
+  final Widget child;
+
+  const FloatingCharacter({Key? key, required this.child}) : super(key: key);
+
+  @override
+  State<FloatingCharacter> createState() => _FloatingCharacterState();
+}
+
+class _FloatingCharacterState extends State<FloatingCharacter>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1500),
+    )..repeat(reverse: true);
+    _animation = Tween<double>(begin: -10, end: 10).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _animation,
+      builder: (context, child) {
+        return Transform.translate(
+          offset: Offset(0, _animation.value),
+          child: widget.child,
+        );
+      },
     );
   }
 }

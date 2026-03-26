@@ -7,6 +7,7 @@ import '../quiz/quiz_screen.dart';
 import '../materi/materi_list_screen.dart';
 import '../evaluasi/evaluasi_screen.dart';
 import '../../core/widgets/bubbly_background.dart';
+import '../platformer/presentation/platformer_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -121,6 +122,34 @@ class HomeScreen extends StatelessWidget {
                               'assets/images/home_screen/eval_button.png',
                               fit: BoxFit.contain,
                             ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Flexible(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        ElevatedButton.icon(
+                          style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                            backgroundColor: Colors.amber,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                          ),
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const PlatformerScreen(),
+                              ),
+                            );
+                          },
+                          icon: const Icon(Icons.videogame_asset, color: Colors.black, size: 30),
+                          label: const Text(
+                            'Main Game Mario Math', 
+                            style: TextStyle(fontSize: 20, color: Colors.black, fontWeight: FontWeight.bold),
                           ),
                         ),
                       ],

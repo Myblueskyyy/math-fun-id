@@ -1,0 +1,319 @@
+import 'package:flutter/material.dart';
+import 'package:flame/game.dart';
+import '../platformer_game.dart';
+import '../domain/question.dart';
+
+class PlatformerScreen extends StatefulWidget {
+  const PlatformerScreen({Key? key}) : super(key: key);
+
+  @override
+  _PlatformerScreenState createState() => _PlatformerScreenState();
+}
+
+class _PlatformerScreenState extends State<PlatformerScreen> {
+  late PlatformerGame game;
+  int? activeQuestionIndex;
+  
+  bool isIntro = true;
+  bool showDiscussion = false;
+  int failCount = 0;
+
+  final List<MathQuestion> questions = [
+    MathQuestion(
+      question: "Pak Budi membeli sepatu seharga Rp 200.000 dengan diskon 15%. Berapa yang harus dibayar?",
+      options: ["Rp 150.000", "Rp 170.000", "Rp 185.000", "Rp 195.000"],
+      correctIndex: 1, 
+      pembahasan: "Diskon = 15% x Rp 200.000 = Rp 30.000.\nHarga Bayar = Rp 200.000 - Rp 30.000 = Rp 170.000.",
+    ),
+    MathQuestion(
+      question: "Siti menabung Rp 500.000 dengan bunga 8% per tahun. Total tabungan setelah 1 tahun adalah?",
+      options: ["Rp 540.000", "Rp 508.000", "Rp 550.000", "Rp 580.000"],
+      correctIndex: 0, 
+      pembahasan: "Bunga = 8% x Rp 500.000 = Rp 40.000.\nTotal = Rp 500.000 + Rp 40.000 = Rp 540.000.",
+    ),
+    MathQuestion(
+      question: "Pedagang membeli beras 50kg dengan harga Rp 500.000, lalu dijual kembali Rp 12.000 per kg. Pedagang mengalami?",
+      options: ["Rugi Rp 100.000", "Untung Rp 100.000", "Untung Rp 200.000", "Rugi Rp 50.000"],
+      correctIndex: 1, 
+      pembahasan: "Harga Jual = 50 x Rp 12.000 = Rp 600.000.\nUntung = Rp 600.000 - Rp 500.000 = Rp 100.000.",
+    ),
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    game = PlatformerGame(
+      onQuestionTriggered: (index) {
+        setState(() {
+          activeQuestionIndex = index;
+          failCount = 0;
+          showDiscussion = false;
+        });
+      },
+      onGameCompleted: () {
+        _showGameOverDialog();
+      },
+    );
+  }
+
+  void _showGameOverDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: const Text('Luar Biasa!'),
+        content: const Text('Kamu berhasil mengumpulkan semua bintang dan menyelesaikan tantangan Aritmatika Sosial!'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context); 
+              Navigator.pop(context); 
+            },
+            child: const Text('Kembali ke Menu Utama'),
+          )
+        ],
+      ),
+    );
+  }
+
+  void _answerQuestion(int optionIndex) {
+    if (activeQuestionIndex == null) return;
+    
+    if (optionIndex == questions[activeQuestionIndex!].correctIndex) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Jawaban Benar!'), backgroundColor: Colors.green)
+      );
+      setState(() {
+        showDiscussion = true;
+      });
+    } else {
+      setState(() {
+        failCount++;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Jawaban Salah, coba lagi ya!'), backgroundColor: Colors.red)
+      );
+    }
+  }
+
+  void _continueGameAfterDiscussion() {
+    setState(() {
+      activeQuestionIndex = null;
+      showDiscussion = false;
+      failCount = 0;
+    });
+    game.answerCorrectly(); 
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Stack(
+        children: [
+          GameWidget(game: game),
+          
+          if (!isIntro && activeQuestionIndex == null) ...[
+            // Tombol Kembali
+            Positioned(
+              top: 40,
+              left: 20,
+              child: FloatingActionButton(
+                mini: true,
+                backgroundColor: Colors.white.withOpacity(0.5),
+                onPressed: () => Navigator.pop(context),
+                child: const Icon(Icons.arrow_back, color: Colors.black),
+              ),
+            ),
+            
+            // Controller Kiri & Kanan
+            Positioned(
+              bottom: 40,
+              left: 20,
+              child: Row(
+                children: [
+                  GestureDetector(
+                    onTapDown: (_) => game.moveLeft(),
+                    onTapUp: (_) => game.stopMoving(),
+                    onTapCancel: () => game.stopMoving(),
+                    child: Container(
+                      decoration: BoxDecoration(color: Colors.white.withOpacity(0.5), shape: BoxShape.circle),
+                      padding: const EdgeInsets.all(24),
+                      child: const Icon(Icons.keyboard_arrow_left, size: 40),
+                    ),
+                  ),
+                  const SizedBox(width: 20),
+                  GestureDetector(
+                    onTapDown: (_) => game.moveRight(),
+                    onTapUp: (_) => game.stopMoving(),
+                    onTapCancel: () => game.stopMoving(),
+                    child: Container(
+                      decoration: BoxDecoration(color: Colors.white.withOpacity(0.5), shape: BoxShape.circle),
+                      padding: const EdgeInsets.all(24),
+                      child: const Icon(Icons.keyboard_arrow_right, size: 40),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            
+            // Controller Lompat
+            Positioned(
+              bottom: 40,
+              right: 20,
+              child: GestureDetector(
+                onTapDown: (_) => game.jump(),
+                child: Container(
+                  decoration: BoxDecoration(color: Colors.white.withOpacity(0.5), shape: BoxShape.circle),
+                  padding: const EdgeInsets.all(24),
+                  child: const Icon(Icons.arrow_upward, size: 40),
+                ),
+              ),
+            ),
+          ],
+
+          // Panel Intro
+          if (isIntro)
+            Container(
+              color: Colors.black.withOpacity(0.8),
+              child: Center(
+                child: Card(
+                  margin: const EdgeInsets.symmetric(horizontal: 40),
+                  child: Padding(
+                    padding: const EdgeInsets.all(32),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Text(
+                          "Misi Kamu:",
+                          style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 20),
+                        const Text(
+                          "Kumpulkan semua bintang yang melayang! ✨\nSetiap kamu mendapatkan bintang, ujian Aritmatika Sosial menantimu.\nJawablah dengan benar untuk terus melanjutkan tantangan.",
+                          style: TextStyle(fontSize: 18),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 30),
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
+                            backgroundColor: Colors.amber,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              isIntro = false;
+                            });
+                            game.resumeEngine();
+                          },
+                          child: const Text('Mulai Bermain!', style: TextStyle(fontSize: 20, color: Colors.black, fontWeight: FontWeight.bold)),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+
+          // Overlay Pertanyaan & Pembahasan
+          if (activeQuestionIndex != null)
+            Container(
+              color: Colors.black.withOpacity(0.8),
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Card(
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    child: Padding(
+                      padding: const EdgeInsets.all(24),
+                      child: showDiscussion 
+                        ? _buildDiscussionPanel()
+                        : _buildQuestionPanel(),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildQuestionPanel() {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const Text(
+          "Pertanyaan",
+          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 20),
+        Text(
+          questions[activeQuestionIndex!].question,
+          style: const TextStyle(fontSize: 18),
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 30),
+        Wrap(
+          spacing: 12,
+          runSpacing: 12,
+          alignment: WrapAlignment.center,
+          children: List.generate(
+            questions[activeQuestionIndex!].options.length,
+            (idx) => ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              ),
+              onPressed: () => _answerQuestion(idx),
+              child: Text(questions[activeQuestionIndex!].options[idx]),
+            ),
+          ),
+        ),
+        if (failCount >= 2) ...[
+          const SizedBox(height: 20),
+          Padding(
+            padding: const EdgeInsets.only(top: 10),
+            child: TextButton.icon(
+              onPressed: () {
+                setState(() {
+                  showDiscussion = true;
+                });
+              },
+              icon: const Icon(Icons.lightbulb, color: Colors.amber),
+              label: const Text(
+                "Kesulitan? Klik untuk melihat Jawaban & Pembahasan", 
+                style: TextStyle(color: Colors.amber, fontSize: 16, fontWeight: FontWeight.bold)
+              ),
+            ),
+          )
+        ]
+      ],
+    );
+  }
+
+  Widget _buildDiscussionPanel() {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const Text(
+          "Pembahasan",
+          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.green),
+        ),
+        const SizedBox(height: 20),
+        Text(
+          questions[activeQuestionIndex!].pembahasan,
+          style: const TextStyle(fontSize: 18),
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 30),
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
+            backgroundColor: Colors.amber,
+          ),
+          onPressed: _continueGameAfterDiscussion,
+          child: const Text('Lanjutkan Petualangan!', style: TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.bold)),
+        ),
+      ],
+    );
+  }
+}

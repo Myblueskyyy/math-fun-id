@@ -1,5 +1,6 @@
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
+import 'package:flame/effects.dart';
 import 'package:flutter/material.dart';
 
 class VisualNovelGame extends FlameGame {
@@ -53,6 +54,7 @@ class VisualNovelGame extends FlameGame {
           size: charSize,
           position: Vector2(size.x * 0.05, size.y - charSize.y),
         );
+        _addBreathingEffect(_characterLeft!);
         add(_characterLeft!);
       }
     }
@@ -72,6 +74,7 @@ class VisualNovelGame extends FlameGame {
           size: charSize,
           position: Vector2(size.x * 0.95 - charSize.x, size.y - charSize.y),
         );
+        _addBreathingEffect(_characterRight!);
         add(_characterRight!);
       }
     }
@@ -86,6 +89,20 @@ class VisualNovelGame extends FlameGame {
     if (_characterRight != null) {
       _characterRight!.priority = 1;
     }
+  }
+
+  void _addBreathingEffect(SpriteComponent component) {
+    component.add(
+      MoveEffect.by(
+        Vector2(0, -10),
+        EffectController(
+          duration: 1.5,
+          reverseDuration: 1.5,
+          infinite: true,
+          curve: Curves.easeInOut,
+        ),
+      ),
+    );
   }
 
   Vector2 _calculateCharSize(Sprite sprite, Vector2 gameSize) {

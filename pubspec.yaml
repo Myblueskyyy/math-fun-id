@@ -70,6 +70,10 @@ flutter:
     - assets/images/home_screen/
     - assets/images/vn/
     - assets/images/characters/
+    - assets/char/
+    - assets/clouds/
+    - assets/tiles/
+    - assets/star.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
