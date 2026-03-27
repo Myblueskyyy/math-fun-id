@@ -8,7 +8,7 @@ import 'components/question_item.dart';
 class PlatformerGame extends FlameGame with HasCollisionDetection {
   late Player player;
   int itemsCollected = 0;
-  final int totalItems = 3;
+  final int totalItems = 4;
 
   final void Function(int itemIndex) onQuestionTriggered;
   final VoidCallback onGameCompleted;
@@ -20,12 +20,14 @@ class PlatformerGame extends FlameGame with HasCollisionDetection {
 
   @override
   Future<void> onLoad() async {
-    debugMode = true;
+    debugMode = false; // Nonaktifkan debug mode untuk tampilan bersih
     images.prefix = 'assets/';
 
     // Tambah background
     final bgSprite = await loadSprite('clouds/1.png');
     add(SpriteComponent(sprite: bgSprite, size: size));
+    final bgSprites = await loadSprite('clouds/4.png');
+    add(SpriteComponent(sprite: bgSprites, size: size));
 
     // Platform dasar (lantai)
     add(Ground(position: Vector2(0, size.y - 40), size: Vector2(size.x, 40)));
@@ -34,15 +36,26 @@ class PlatformerGame extends FlameGame with HasCollisionDetection {
     add(Ground(position: Vector2(100, size.y - 150), size: Vector2(100, 20)));
     add(Ground(position: Vector2(300, size.y - 250), size: Vector2(100, 20)));
     add(Ground(position: Vector2(500, size.y - 180), size: Vector2(100, 20)));
+    add(Ground(position: Vector2(700, size.y - 280), size: Vector2(100, 20)));
 
     // Pertanyaan (Items)
     add(QuestionItem(itemIndex: 0, position: Vector2(135, size.y - 190)));
     add(QuestionItem(itemIndex: 1, position: Vector2(335, size.y - 290)));
     add(QuestionItem(itemIndex: 2, position: Vector2(550, size.y - 220)));
+    add(QuestionItem(itemIndex: 3, position: Vector2(750, size.y - 320)));
 
     // Player
     player = Player(position: Vector2(20, size.y - 100));
     add(player);
+  }
+
+  void resetGame() {
+    itemsCollected = 0;
+    player.position = Vector2(20, size.y - 100);
+    player.velocity = Vector2.zero();
+    player.moveDirection = 0;
+    // Kita tidak menghapus QuestionItem di sini karena logika restart biasanya 
+    // dilakukan dengan memuat ulang state di Flutter, namun ini sebagai pengaman.
   }
 
   void triggerQuestion(int itemIndex) {

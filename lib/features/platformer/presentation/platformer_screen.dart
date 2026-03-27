@@ -16,7 +16,9 @@ class _PlatformerScreenState extends State<PlatformerScreen> {
   
   bool isIntro = true;
   bool showDiscussion = false;
-  int failCount = 0;
+  int lives = 3;
+  int score = 0;
+  Set<int> answeredCorrectlyIndices = {};
 
   final List<MathQuestion> questions = [
     MathQuestion(
@@ -37,43 +39,80 @@ class _PlatformerScreenState extends State<PlatformerScreen> {
       correctIndex: 1, 
       pembahasan: "Harga Jual = 50 x Rp 12.000 = Rp 600.000.\nUntung = Rp 600.000 - Rp 500.000 = Rp 100.000.",
     ),
+    MathQuestion(
+      question: "Sebuah baju dijual dengan harga Rp 120.000 dan pedagang mendapatkan untung 20%. Berapa harga belinya?",
+      options: ["Rp 90.000", "Rp 100.000", "Rp 110.000", "Rp 115.000"],
+      correctIndex: 1,
+      pembahasan: "Harga Beli = Harga Jual / (1 + %Untung)\nHarga Beli = 120.000 / 1.2 = Rp 100.000.",
+    ),
   ];
 
   @override
   void initState() {
     super.initState();
+    _initGame();
+  }
+
+  void _initGame() {
     game = PlatformerGame(
       onQuestionTriggered: (index) {
         setState(() {
           activeQuestionIndex = index;
-          failCount = 0;
           showDiscussion = false;
         });
       },
       onGameCompleted: () {
-        _showGameOverDialog();
+        _showEndDialog(isWin: true);
       },
     );
   }
 
-  void _showGameOverDialog() {
+  void _showEndDialog({required bool isWin}) {
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
-        title: const Text('Luar Biasa!'),
-        content: const Text('Kamu berhasil mengumpulkan semua bintang dan menyelesaikan tantangan Aritmatika Sosial!'),
+        title: Text(isWin ? 'Luar Biasa!' : 'Yah, Nyawa Habis!'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(isWin 
+              ? 'Kamu berhasil menyelesaikan tantangan!' 
+              : 'Jangan menyerah, coba lagi untuk mengasah kemampuanmu.'),
+            const SizedBox(height: 20),
+            Text('Skor Akhir: $score / 100', style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+          ],
+        ),
         actions: [
           TextButton(
             onPressed: () {
-              Navigator.pop(context); 
-              Navigator.pop(context); 
+              Navigator.pop(context); // Close dialog
+              Navigator.pop(context); // Back to previous menu
             },
-            child: const Text('Kembali ke Menu Utama'),
+            child: const Text('Menu Utama'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _restartGame();
+            },
+            child: const Text('Ulangi'),
           )
         ],
       ),
     );
+  }
+
+  void _restartGame() {
+    setState(() {
+      lives = 3;
+      score = 0;
+      answeredCorrectlyIndices.clear();
+      activeQuestionIndex = null;
+      showDiscussion = false;
+      isIntro = true;
+    });
+    _initGame();
   }
 
   void _answerQuestion(int optionIndex) {
@@ -81,18 +120,25 @@ class _PlatformerScreenState extends State<PlatformerScreen> {
     
     if (optionIndex == questions[activeQuestionIndex!].correctIndex) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Jawaban Benar!'), backgroundColor: Colors.green)
+        const SnackBar(content: Text('Jawaban Benar! (+25 Skor)'), backgroundColor: Colors.green, duration: Duration(seconds: 1))
       );
       setState(() {
+        score += 25;
+        answeredCorrectlyIndices.add(activeQuestionIndex!);
         showDiscussion = true;
       });
     } else {
       setState(() {
-        failCount++;
+        lives--;
       });
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Jawaban Salah, coba lagi ya!'), backgroundColor: Colors.red)
-      );
+      
+      if (lives <= 0) {
+        _showEndDialog(isWin: false);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Jawaban Salah! Nyawa berkurang. Sisa: $lives'), backgroundColor: Colors.red, duration: Duration(seconds: 1))
+        );
+      }
     }
   }
 
@@ -100,7 +146,6 @@ class _PlatformerScreenState extends State<PlatformerScreen> {
     setState(() {
       activeQuestionIndex = null;
       showDiscussion = false;
-      failCount = 0;
     });
     game.answerCorrectly(); 
   }
@@ -112,6 +157,49 @@ class _PlatformerScreenState extends State<PlatformerScreen> {
         children: [
           GameWidget(game: game),
           
+          // HUD: Lives & Score
+          if (!isIntro)
+            Positioned(
+              top: 40,
+              left: 0,
+              right: 0,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    // Hearts
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withOpacity(0.5),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Row(
+                        children: List.generate(3, (index) => Icon(
+                          index < lives ? Icons.favorite : Icons.favorite_border,
+                          color: Colors.red,
+                          size: 28,
+                        )),
+                      ),
+                    ),
+                    // Score
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withOpacity(0.5),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        'Skor: $score',
+                        style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
           if (!isIntro && activeQuestionIndex == null) ...[
             // Tombol Kembali
             Positioned(
@@ -268,24 +356,20 @@ class _PlatformerScreenState extends State<PlatformerScreen> {
             ),
           ),
         ),
-        if (failCount >= 2) ...[
-          const SizedBox(height: 20),
-          Padding(
-            padding: const EdgeInsets.only(top: 10),
-            child: TextButton.icon(
-              onPressed: () {
-                setState(() {
-                  showDiscussion = true;
-                });
-              },
-              icon: const Icon(Icons.lightbulb, color: Colors.amber),
-              label: const Text(
-                "Kesulitan? Klik untuk melihat Jawaban & Pembahasan", 
-                style: TextStyle(color: Colors.amber, fontSize: 16, fontWeight: FontWeight.bold)
-              ),
-            ),
-          )
-        ]
+        const SizedBox(height: 24),
+        TextButton.icon(
+          onPressed: () {
+            setState(() {
+              showDiscussion = true;
+            });
+          },
+          icon: const Icon(Icons.lightbulb, color: Colors.amber),
+          label: const Text(
+            "Lihat Jawaban & Pembahasan\n(Tidak mendapatkan poin)", 
+            textAlign: TextAlign.center,
+            style: TextStyle(color: Colors.amber, fontSize: 14, fontWeight: FontWeight.bold)
+          ),
+        ),
       ],
     );
   }

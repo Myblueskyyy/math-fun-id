@@ -72,7 +72,8 @@ class Player extends SpriteAnimationGroupComponent<PlayerState> with CollisionCa
     
     position += velocity * safeDt;
     
-    if (position.y > gameRef.size.y) {
+    // Safety net untuk batas bawah layar
+    if (position.y > gameRef.size.y - size.y) {
       position.y = gameRef.size.y - size.y;
       velocity.y = 0;
       isOnGround = true;
@@ -86,9 +87,10 @@ class Player extends SpriteAnimationGroupComponent<PlayerState> with CollisionCa
     }
 
     // Ubah status animasi
-    if (!isOnGround) {
+    // Gunakan toleransi velocity untuk menghindari flickering
+    if (!isOnGround && velocity.y.abs() > 10) {
       current = PlayerState.jump;
-    } else if (velocity.x != 0) {
+    } else if (velocity.x.abs() > 0) {
       current = PlayerState.walk;
     } else {
       current = PlayerState.idle;
@@ -125,6 +127,17 @@ class Player extends SpriteAnimationGroupComponent<PlayerState> with CollisionCa
       final double minOverlapX = overlapLeft < overlapRight ? overlapLeft : overlapRight;
       final double minOverlapY = overlapTop < overlapBottom ? overlapTop : overlapBottom;
 
+      // PERBAIKAN: Jika sedang jatuh (velocity.y >= 0), prioritaskan resolusi vertikal ke atas.
+      // Kita beri sedikit toleransi (minOverlapX + 15) agar pemain lebih stabil mendarat 
+      // daripada terdorong ke samping saat berada di ujung platform.
+      if (velocity.y >= 0 && overlapTop < minOverlapX + 15) {
+        position.y = other.position.y - size.y;
+        velocity.y = 0;
+        isOnGround = true;
+        jumpsRemaining = 2;
+        return;
+      }
+
       if (minOverlapX < minOverlapY) {
         // Resolusi horizontal (kiri/kanan)
         if (overlapLeft < overlapRight) {
@@ -142,7 +155,7 @@ class Player extends SpriteAnimationGroupComponent<PlayerState> with CollisionCa
           isOnGround = true;
           jumpsRemaining = 2;
         } else {
-          // Player menabrak platform dari bawah
+          // Player menabrak platform dari bawah (kena kepala)
           position.y = other.position.y + other.size.y;
           velocity.y = 0;
         }
@@ -157,7 +170,11 @@ class Player extends SpriteAnimationGroupComponent<PlayerState> with CollisionCa
   void onCollisionEnd(PositionComponent other) {
     super.onCollisionEnd(other);
     if (other is Ground) {
-      isOnGround = false;
+      // Hanya set isOnGround false jika player memang bergerak ke atas (melompat)
+      // atau jika posisi kaki sudah benar-benar di atas platform
+      if (velocity.y < 0 || (position.y + size.y) < other.position.y) {
+        isOnGround = false;
+      }
     }
   }
 }
