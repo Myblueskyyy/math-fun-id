@@ -71,6 +71,9 @@ flutter:
     - assets/images/vn/
     - assets/images/characters/
     - assets/char/
+    - assets/char/Idle/
+    - assets/char/Jump/
+    - assets/char/Walk/
     - assets/clouds/
     - assets/tiles/
     - assets/star.png

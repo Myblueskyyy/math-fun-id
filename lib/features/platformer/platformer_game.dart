@@ -20,6 +20,7 @@ class PlatformerGame extends FlameGame with HasCollisionDetection {
 
   @override
   Future<void> onLoad() async {
+    debugMode = true;
     images.prefix = 'assets/';
 
     // Tambah background
@@ -45,6 +46,9 @@ class PlatformerGame extends FlameGame with HasCollisionDetection {
   }
 
   void triggerQuestion(int itemIndex) {
+    // Bekukan state player sebelum pause agar tidak jatuh saat resume
+    player.velocity = Vector2.zero();
+    player.moveDirection = 0;
     pauseEngine();
     onQuestionTriggered(itemIndex);
   }
@@ -67,6 +71,9 @@ class PlatformerGame extends FlameGame with HasCollisionDetection {
 
   void answerCorrectly() {
     itemsCollected++;
+    // Pastikan player stabil sebelum resume
+    player.velocity = Vector2.zero();
+    player.moveDirection = 0;
     resumeEngine();
     if (itemsCollected >= totalItems) {
       onGameCompleted();

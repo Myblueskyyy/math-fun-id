@@ -21,24 +21,33 @@ class Player extends SpriteAnimationGroupComponent<PlayerState> with CollisionCa
   @override
   Future<void> onLoad() async {
     // Membentuk animasi Idle
-    final idleImg = await gameRef.images.load('char/Pink_Monster_Idle_4.png');
-    final idleAnim = SpriteAnimation.fromFrameData(
-      idleImg,
-      SpriteAnimationData.sequenced(amount: 4, stepTime: 0.15, textureSize: Vector2(idleImg.width / 4, idleImg.height.toDouble())),
+    final idleSprites = <Sprite>[];
+    for (int i = 1; i <= 4; i++) {
+      idleSprites.add(await gameRef.loadSprite('char/Idle/$i.png'));
+    }
+    final idleAnim = SpriteAnimation.spriteList(
+      idleSprites,
+      stepTime: 0.15,
     );
 
     // Membentuk animasi Walk
-    final walkImg = await gameRef.images.load('char/Pink_Monster_Walk_6.png');
-    final walkAnim = SpriteAnimation.fromFrameData(
-      walkImg,
-      SpriteAnimationData.sequenced(amount: 6, stepTime: 0.1, textureSize: Vector2(walkImg.width / 6, walkImg.height.toDouble())),
+    final walkSprites = <Sprite>[];
+    for (int i = 1; i <= 6; i++) {
+      walkSprites.add(await gameRef.loadSprite('char/Walk/$i.png'));
+    }
+    final walkAnim = SpriteAnimation.spriteList(
+      walkSprites,
+      stepTime: 0.1,
     );
 
     // Membentuk animasi Jump
-    final jumpImg = await gameRef.images.load('char/Pink_Monster_Jump_8.png');
-    final jumpAnim = SpriteAnimation.fromFrameData(
-      jumpImg,
-      SpriteAnimationData.sequenced(amount: 8, stepTime: 0.1, textureSize: Vector2(jumpImg.width / 8, jumpImg.height.toDouble())),
+    final jumpSprites = <Sprite>[];
+    for (int i = 1; i <= 8; i++) {
+      jumpSprites.add(await gameRef.loadSprite('char/Jump/$i.png'));
+    }
+    final jumpAnim = SpriteAnimation.spriteList(
+      jumpSprites,
+      stepTime: 0.1,
     );
 
     animations = {
@@ -54,12 +63,14 @@ class Player extends SpriteAnimationGroupComponent<PlayerState> with CollisionCa
 
   @override
   void update(double dt) {
-    super.update(dt);
+    // Batasi maksimum dt (50ms) agar simulasi fisika tidak loncat (tunneling) saat resumeEngine()
+    double safeDt = dt > 0.05 ? 0.05 : dt;
+    super.update(safeDt);
     
     velocity.x = moveDirection * moveSpeed;
-    velocity.y += gravity * dt;
+    velocity.y += gravity * safeDt;
     
-    position += velocity * dt;
+    position += velocity * safeDt;
     
     if (position.y > gameRef.size.y) {
       position.y = gameRef.size.y - size.y;
@@ -75,7 +86,7 @@ class Player extends SpriteAnimationGroupComponent<PlayerState> with CollisionCa
     }
 
     // Ubah status animasi
-    if (!isOnGround || velocity.y != 0) {
+    if (!isOnGround) {
       current = PlayerState.jump;
     } else if (velocity.x != 0) {
       current = PlayerState.walk;
@@ -104,39 +115,36 @@ class Player extends SpriteAnimationGroupComponent<PlayerState> with CollisionCa
     super.onCollision(intersectionPoints, other);
     
     if (other is Ground) {
-      double playerCenterX = position.x + size.x / 2;
-      double playerCenterY = position.y + size.y / 2;
-      double groundCenterX = other.position.x + other.size.x / 2;
-      double groundCenterY = other.position.y + other.size.y / 2;
+      // Hitung overlap di setiap sisi (AABB)
+      final double overlapLeft = (position.x + size.x) - other.position.x;
+      final double overlapRight = (other.position.x + other.size.x) - position.x;
+      final double overlapTop = (position.y + size.y) - other.position.y;
+      final double overlapBottom = (other.position.y + other.size.y) - position.y;
 
-      double dx = playerCenterX - groundCenterX;
-      double dy = playerCenterY - groundCenterY;
+      // Cari arah dengan overlap terkecil (minimum penetration)
+      final double minOverlapX = overlapLeft < overlapRight ? overlapLeft : overlapRight;
+      final double minOverlapY = overlapTop < overlapBottom ? overlapTop : overlapBottom;
 
-      double width = (size.x + other.size.x) / 2;
-      double height = (size.y + other.size.y) / 2;
-
-      double crossWidth = width * dy;
-      double crossHeight = height * dx;
-
-      if (crossWidth > crossHeight) {
-        if (crossWidth > -crossHeight) {
-          if (velocity.y < 0) {
-            position.y = other.position.y + other.size.y;
-            velocity.y = 0; 
-          }
+      if (minOverlapX < minOverlapY) {
+        // Resolusi horizontal (kiri/kanan)
+        if (overlapLeft < overlapRight) {
+          position.x = other.position.x - size.x;
         } else {
-          if (velocity.x > 0) position.x = other.position.x - size.x;
+          position.x = other.position.x + other.size.x;
         }
+        velocity.x = 0;
       } else {
-        if (crossWidth > -crossHeight) {
-          if (velocity.x < 0) position.x = other.position.x + other.size.x;
+        // Resolusi vertikal (atas/bawah)
+        if (overlapTop < overlapBottom) {
+          // Player mendarat di atas platform
+          position.y = other.position.y - size.y;
+          velocity.y = 0;
+          isOnGround = true;
+          jumpsRemaining = 2;
         } else {
-          if (velocity.y > 0) {
-            position.y = other.position.y - size.y;
-            velocity.y = 0;
-            isOnGround = true;
-            jumpsRemaining = 2; 
-          }
+          // Player menabrak platform dari bawah
+          position.y = other.position.y + other.size.y;
+          velocity.y = 0;
         }
       }
     } else if (other is QuestionItem) {
@@ -148,5 +156,8 @@ class Player extends SpriteAnimationGroupComponent<PlayerState> with CollisionCa
   @override
   void onCollisionEnd(PositionComponent other) {
     super.onCollisionEnd(other);
+    if (other is Ground) {
+      isOnGround = false;
+    }
   }
 }
