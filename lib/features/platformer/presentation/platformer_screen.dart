@@ -13,7 +13,7 @@ class PlatformerScreen extends StatefulWidget {
 class _PlatformerScreenState extends State<PlatformerScreen> {
   late PlatformerGame game;
   int? activeQuestionIndex;
-  
+
   bool isIntro = true;
   bool showDiscussion = false;
   int lives = 3;
@@ -22,28 +22,41 @@ class _PlatformerScreenState extends State<PlatformerScreen> {
 
   final List<MathQuestion> questions = [
     MathQuestion(
-      question: "Pak Budi membeli sepatu seharga Rp 200.000 dengan diskon 15%. Berapa yang harus dibayar?",
+      question:
+          "Pak Budi membeli sepatu seharga Rp 200.000 dengan diskon 15%. Berapa yang harus dibayar?",
       options: ["Rp 150.000", "Rp 170.000", "Rp 185.000", "Rp 195.000"],
-      correctIndex: 1, 
-      pembahasan: "Diskon = 15% x Rp 200.000 = Rp 30.000.\nHarga Bayar = Rp 200.000 - Rp 30.000 = Rp 170.000.",
+      correctIndex: 1,
+      pembahasan:
+          "Diskon = 15% x Rp 200.000 = Rp 30.000.\nHarga Bayar = Rp 200.000 - Rp 30.000 = Rp 170.000.",
     ),
     MathQuestion(
-      question: "Siti menabung Rp 500.000 dengan bunga 8% per tahun. Total tabungan setelah 1 tahun adalah?",
+      question:
+          "Siti menabung Rp 500.000 dengan bunga 8% per tahun. Total tabungan setelah 1 tahun adalah?",
       options: ["Rp 540.000", "Rp 508.000", "Rp 550.000", "Rp 580.000"],
-      correctIndex: 0, 
-      pembahasan: "Bunga = 8% x Rp 500.000 = Rp 40.000.\nTotal = Rp 500.000 + Rp 40.000 = Rp 540.000.",
+      correctIndex: 0,
+      pembahasan:
+          "Bunga = 8% x Rp 500.000 = Rp 40.000.\nTotal = Rp 500.000 + Rp 40.000 = Rp 540.000.",
     ),
     MathQuestion(
-      question: "Pedagang membeli beras 50kg dengan harga Rp 500.000, lalu dijual kembali Rp 12.000 per kg. Pedagang mengalami?",
-      options: ["Rugi Rp 100.000", "Untung Rp 100.000", "Untung Rp 200.000", "Rugi Rp 50.000"],
-      correctIndex: 1, 
-      pembahasan: "Harga Jual = 50 x Rp 12.000 = Rp 600.000.\nUntung = Rp 600.000 - Rp 500.000 = Rp 100.000.",
+      question:
+          "Pedagang membeli beras 50kg dengan harga Rp 500.000, lalu dijual kembali Rp 12.000 per kg. Pedagang mengalami?",
+      options: [
+        "Rugi Rp 100.000",
+        "Untung Rp 100.000",
+        "Untung Rp 200.000",
+        "Rugi Rp 50.000",
+      ],
+      correctIndex: 1,
+      pembahasan:
+          "Harga Jual = 50 x Rp 12.000 = Rp 600.000.\nUntung = Rp 600.000 - Rp 500.000 = Rp 100.000.",
     ),
     MathQuestion(
-      question: "Sebuah baju dijual dengan harga Rp 120.000 dan pedagang mendapatkan untung 20%. Berapa harga belinya?",
+      question:
+          "Sebuah baju dijual dengan harga Rp 120.000 dan pedagang mendapatkan untung 20%. Berapa harga belinya?",
       options: ["Rp 90.000", "Rp 100.000", "Rp 110.000", "Rp 115.000"],
       correctIndex: 1,
-      pembahasan: "Harga Beli = Harga Jual / (1 + %Untung)\nHarga Beli = 120.000 / 1.2 = Rp 100.000.",
+      pembahasan:
+          "Harga Beli = Harga Jual / (1 + %Untung)\nHarga Beli = 120.000 / 1.2 = Rp 100.000.",
     ),
   ];
 
@@ -76,11 +89,16 @@ class _PlatformerScreenState extends State<PlatformerScreen> {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(isWin 
-              ? 'Kamu berhasil menyelesaikan tantangan!' 
-              : 'Jangan menyerah, coba lagi untuk mengasah kemampuanmu.'),
+            Text(
+              isWin
+                  ? 'Kamu berhasil menyelesaikan tantangan!'
+                  : 'Jangan menyerah, coba lagi untuk mengasah kemampuanmu.',
+            ),
             const SizedBox(height: 20),
-            Text('Skor Akhir: $score / 100', style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+            Text(
+              'Skor Akhir: $score / 100',
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
           ],
         ),
         actions: [
@@ -97,7 +115,7 @@ class _PlatformerScreenState extends State<PlatformerScreen> {
               _restartGame();
             },
             child: const Text('Ulangi'),
-          )
+          ),
         ],
       ),
     );
@@ -117,10 +135,14 @@ class _PlatformerScreenState extends State<PlatformerScreen> {
 
   void _answerQuestion(int optionIndex) {
     if (activeQuestionIndex == null) return;
-    
+
     if (optionIndex == questions[activeQuestionIndex!].correctIndex) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Jawaban Benar! (+25 Skor)'), backgroundColor: Colors.green, duration: Duration(seconds: 1))
+        const SnackBar(
+          content: Text('Jawaban Benar! (+25 Skor)'),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 1),
+        ),
       );
       setState(() {
         score += 25;
@@ -131,12 +153,16 @@ class _PlatformerScreenState extends State<PlatformerScreen> {
       setState(() {
         lives--;
       });
-      
+
       if (lives <= 0) {
         _showEndDialog(isWin: false);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Jawaban Salah! Nyawa berkurang. Sisa: $lives'), backgroundColor: Colors.red, duration: Duration(seconds: 1))
+          SnackBar(
+            content: Text('Jawaban Salah! Nyawa berkurang. Sisa: $lives'),
+            backgroundColor: Colors.red,
+            duration: Duration(seconds: 1),
+          ),
         );
       }
     }
@@ -147,7 +173,7 @@ class _PlatformerScreenState extends State<PlatformerScreen> {
       activeQuestionIndex = null;
       showDiscussion = false;
     });
-    game.answerCorrectly(); 
+    game.answerCorrectly();
   }
 
   @override
@@ -156,7 +182,7 @@ class _PlatformerScreenState extends State<PlatformerScreen> {
       body: Stack(
         children: [
           GameWidget(game: game),
-          
+
           // HUD: Lives & Score
           if (!isIntro)
             Positioned(
@@ -166,33 +192,48 @@ class _PlatformerScreenState extends State<PlatformerScreen> {
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     // Hearts
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
                       decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.5),
+                        color: Colors.white.withOpacity(0.5),
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Row(
-                        children: List.generate(3, (index) => Icon(
-                          index < lives ? Icons.favorite : Icons.favorite_border,
-                          color: Colors.red,
-                          size: 28,
-                        )),
+                        children: List.generate(
+                          3,
+                          (index) => Icon(
+                            index < lives
+                                ? Icons.favorite
+                                : Icons.favorite_border,
+                            color: Colors.red,
+                            size: 28,
+                          ),
+                        ),
                       ),
                     ),
                     // Score
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.black.withOpacity(0.5),
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(
                         'Skor: $score',
-                        style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ],
@@ -212,7 +253,7 @@ class _PlatformerScreenState extends State<PlatformerScreen> {
                 child: const Icon(Icons.arrow_back, color: Colors.black),
               ),
             ),
-            
+
             // Controller Kiri & Kanan
             Positioned(
               bottom: 40,
@@ -224,7 +265,10 @@ class _PlatformerScreenState extends State<PlatformerScreen> {
                     onTapUp: (_) => game.stopMoving(),
                     onTapCancel: () => game.stopMoving(),
                     child: Container(
-                      decoration: BoxDecoration(color: Colors.white.withOpacity(0.5), shape: BoxShape.circle),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.5),
+                        shape: BoxShape.circle,
+                      ),
                       padding: const EdgeInsets.all(24),
                       child: const Icon(Icons.keyboard_arrow_left, size: 40),
                     ),
@@ -235,7 +279,10 @@ class _PlatformerScreenState extends State<PlatformerScreen> {
                     onTapUp: (_) => game.stopMoving(),
                     onTapCancel: () => game.stopMoving(),
                     child: Container(
-                      decoration: BoxDecoration(color: Colors.white.withOpacity(0.5), shape: BoxShape.circle),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.5),
+                        shape: BoxShape.circle,
+                      ),
                       padding: const EdgeInsets.all(24),
                       child: const Icon(Icons.keyboard_arrow_right, size: 40),
                     ),
@@ -243,7 +290,7 @@ class _PlatformerScreenState extends State<PlatformerScreen> {
                 ],
               ),
             ),
-            
+
             // Controller Lompat
             Positioned(
               bottom: 40,
@@ -251,7 +298,10 @@ class _PlatformerScreenState extends State<PlatformerScreen> {
               child: GestureDetector(
                 onTapDown: (_) => game.jump(),
                 child: Container(
-                  decoration: BoxDecoration(color: Colors.white.withOpacity(0.5), shape: BoxShape.circle),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.5),
+                    shape: BoxShape.circle,
+                  ),
                   padding: const EdgeInsets.all(24),
                   child: const Icon(Icons.arrow_upward, size: 40),
                 ),
@@ -273,7 +323,10 @@ class _PlatformerScreenState extends State<PlatformerScreen> {
                       children: [
                         const Text(
                           "Misi Kamu:",
-                          style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                         const SizedBox(height: 20),
                         const Text(
@@ -284,7 +337,10 @@ class _PlatformerScreenState extends State<PlatformerScreen> {
                         const SizedBox(height: 30),
                         ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 40,
+                              vertical: 16,
+                            ),
                             backgroundColor: Colors.amber,
                           ),
                           onPressed: () {
@@ -293,7 +349,14 @@ class _PlatformerScreenState extends State<PlatformerScreen> {
                             });
                             game.resumeEngine();
                           },
-                          child: const Text('Mulai Bermain!', style: TextStyle(fontSize: 20, color: Colors.black, fontWeight: FontWeight.bold)),
+                          child: const Text(
+                            'Mulai Bermain!',
+                            style: TextStyle(
+                              fontSize: 20,
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                         ),
                       ],
                     ),
@@ -310,12 +373,14 @@ class _PlatformerScreenState extends State<PlatformerScreen> {
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Card(
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
                     child: Padding(
                       padding: const EdgeInsets.all(24),
-                      child: showDiscussion 
-                        ? _buildDiscussionPanel()
-                        : _buildQuestionPanel(),
+                      child: showDiscussion
+                          ? _buildDiscussionPanel()
+                          : _buildQuestionPanel(),
                     ),
                   ),
                 ),
@@ -349,7 +414,10 @@ class _PlatformerScreenState extends State<PlatformerScreen> {
             questions[activeQuestionIndex!].options.length,
             (idx) => ElevatedButton(
               style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 12,
+                ),
               ),
               onPressed: () => _answerQuestion(idx),
               child: Text(questions[activeQuestionIndex!].options[idx]),
@@ -365,9 +433,13 @@ class _PlatformerScreenState extends State<PlatformerScreen> {
           },
           icon: const Icon(Icons.lightbulb, color: Colors.amber),
           label: const Text(
-            "Lihat Jawaban & Pembahasan\n(Tidak mendapatkan poin)", 
+            "Lihat Jawaban & Pembahasan\n(Tidak mendapatkan poin)",
             textAlign: TextAlign.center,
-            style: TextStyle(color: Colors.amber, fontSize: 14, fontWeight: FontWeight.bold)
+            style: TextStyle(
+              color: Colors.amber,
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
       ],
@@ -380,7 +452,11 @@ class _PlatformerScreenState extends State<PlatformerScreen> {
       children: [
         const Text(
           "Pembahasan",
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.green),
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: Colors.green,
+          ),
         ),
         const SizedBox(height: 20),
         Text(
@@ -395,7 +471,14 @@ class _PlatformerScreenState extends State<PlatformerScreen> {
             backgroundColor: Colors.amber,
           ),
           onPressed: _continueGameAfterDiscussion,
-          child: const Text('Lanjutkan Petualangan!', style: TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.bold)),
+          child: const Text(
+            'Lanjutkan Petualangan!',
+            style: TextStyle(
+              fontSize: 18,
+              color: Colors.black,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
         ),
       ],
     );
