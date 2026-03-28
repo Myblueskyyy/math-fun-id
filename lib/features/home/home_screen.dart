@@ -8,6 +8,7 @@ import '../materi/materi_list_screen.dart';
 import '../evaluasi/evaluasi_screen.dart';
 import '../../core/widgets/bubbly_background.dart';
 import '../platformer/presentation/platformer_screen.dart';
+import '../frog_jump/presentation/frog_jump_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -129,12 +130,14 @@ class HomeScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
                   Flexible(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                    child: Wrap(
+                      spacing: 16,
+                      runSpacing: 16,
+                      alignment: WrapAlignment.center,
                       children: [
                         ElevatedButton.icon(
                           style: ElevatedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                             backgroundColor: Colors.amber,
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                           ),
@@ -146,10 +149,30 @@ class HomeScreen extends StatelessWidget {
                               ),
                             );
                           },
-                          icon: const Icon(Icons.videogame_asset, color: Colors.black, size: 30),
+                          icon: const Icon(Icons.videogame_asset, color: Colors.black, size: 28),
                           label: const Text(
-                            'Main Game Mario Math', 
-                            style: TextStyle(fontSize: 20, color: Colors.black, fontWeight: FontWeight.bold),
+                            'Mario Math', 
+                            style: TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        ElevatedButton.icon(
+                          style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                            backgroundColor: Colors.green,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                          ),
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const FrogJumpScreen(),
+                              ),
+                            );
+                          },
+                          icon: const Icon(Icons.pets, color: Colors.white, size: 28),
+                          label: const Text(
+                            'Lompat Katak', 
+                            style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),
                           ),
                         ),
                       ],
