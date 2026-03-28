@@ -62,6 +62,10 @@ class _FrogJumpScreenState extends State<FrogJumpScreen> {
         });
       },
     );
+    // Initialize first question options
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      game.updateOptions(questions[currentQuestionIndex].options);
+    });
   }
 
   void _handleAnswer(int index) {
@@ -92,6 +96,7 @@ class _FrogJumpScreenState extends State<FrogJumpScreen> {
         currentQuestionIndex++;
         showDiscussion = false;
         game.resetFrog();
+        game.updateOptions(questions[currentQuestionIndex].options);
       } else {
         _showGameOver(isWin: true);
       }
@@ -123,6 +128,7 @@ class _FrogJumpScreenState extends State<FrogJumpScreen> {
                 showDiscussion = false;
               });
               game.resetFrog();
+              game.updateOptions(questions[currentQuestionIndex].options);
             },
             child: const Text('Ulangi'),
           ),
@@ -138,75 +144,82 @@ class _FrogJumpScreenState extends State<FrogJumpScreen> {
         children: [
           GameWidget(game: game),
           
-          // HUD: Lives & Score
+          // TOP PROGRESS BAR
           Positioned(
-            top: 40,
+            top: 10,
+            left: 10,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              decoration: BoxDecoration(
+                color: Colors.green.withOpacity(0.8),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: Colors.white, width: 2),
+              ),
+              child: Text(
+                'Pertanyaan: ${currentQuestionIndex + 1} / ${questions.length}',
+                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12),
+              ),
+            ),
+          ),
+
+          // CLEAN QUESTION BOX
+          Positioned(
+            top: 50,
+            left: 20,
+            right: 20,
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(15),
+                boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 10)],
+                border: Border.all(color: Colors.green, width: 3),
+              ),
+              child: Text(
+                questions[currentQuestionIndex].question,
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87),
+              ),
+            ),
+          ),
+
+          // BOTTOM HUD (Timer & Controls)
+          Positioned(
+            bottom: 20,
             left: 20,
             right: 20,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: Colors.black45,
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                  child: Row(
-                    children: List.generate(
-                      3,
-                      (i) => Icon(
-                        i < lives ? Icons.favorite : Icons.favorite_border,
-                        color: Colors.red,
-                      ),
-                    ),
-                  ),
-                ),
+                // Timer Mockup
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   decoration: BoxDecoration(
-                    color: Colors.black45,
-                    borderRadius: BorderRadius.circular(15),
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: Colors.green, width: 2),
                   ),
-                  child: Text(
-                    'Skor: $score',
-                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.timer, color: Colors.green),
+                      const SizedBox(width: 8),
+                      const Text("00:45", style: TextStyle(fontWeight: FontWeight.bold)),
+                    ],
                   ),
+                ),
+                // Score & Settings
+                Row(
+                  children: [
+                    _hudCircleButton(Icons.tune),
+                    const SizedBox(width: 8),
+                    _hudCircleButton(Icons.fullscreen),
+                  ],
                 ),
               ],
             ),
           ),
 
-          // Question Overlay
-          if (!isGameOver)
-            Positioned(
-              top: 100,
-              left: 20,
-              right: 20,
-              child: Card(
-                elevation: 8,
-                color: Colors.white.withOpacity(0.9),
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    children: [
-                      Text(
-                        "Pertanyaan ${currentQuestionIndex + 1}/${questions.length}",
-                        style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.green),
-                      ),
-                      const Divider(),
-                      Text(
-                        questions[currentQuestionIndex].question,
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(fontSize: 18),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-
-          // Discussion & Next Button Overlay
+          // Discussion Overlay
           if (showDiscussion)
             Container(
               color: Colors.black54,
@@ -214,31 +227,33 @@ class _FrogJumpScreenState extends State<FrogJumpScreen> {
                 child: Padding(
                   padding: const EdgeInsets.all(24.0),
                   child: Card(
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                     child: Padding(
                       padding: const EdgeInsets.all(24.0),
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(Icons.check_circle, color: Colors.green, size: 60),
+                          const Icon(Icons.check_circle, color: Colors.green, size: 80),
                           const SizedBox(height: 16),
                           const Text(
-                            "Benar!",
-                            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                            "JAWABAN BENAR!",
+                            style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.green),
                           ),
                           const SizedBox(height: 16),
                           Text(
                             questions[currentQuestionIndex].pembahasan,
                             textAlign: TextAlign.center,
-                            style: const TextStyle(fontSize: 16),
+                            style: const TextStyle(fontSize: 18),
                           ),
-                          const SizedBox(height: 24),
+                          const SizedBox(height: 32),
                           ElevatedButton(
                             onPressed: _nextQuestion,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.green,
-                              padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                              padding: const EdgeInsets.symmetric(horizontal: 60, vertical: 20),
                             ),
-                            child: const Text("Lanjut", style: TextStyle(color: Colors.white)),
+                            child: const Text("LANJUT", style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
                           ),
                         ],
                       ),
@@ -247,18 +262,30 @@ class _FrogJumpScreenState extends State<FrogJumpScreen> {
                 ),
               ),
             ),
-          
+
           // Back Button
           Positioned(
-            top: 40,
-            left: 20,
+            top: 10,
+            right: 10,
             child: IconButton(
-              icon: const Icon(Icons.arrow_back, color: Colors.white, size: 30),
+              icon: const Icon(Icons.close, color: Colors.red, size: 30),
               onPressed: () => Navigator.pop(context),
             ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _hudCircleButton(IconData icon) {
+    return Container(
+      padding: const EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        shape: BoxShape.circle,
+        border: Border.all(color: Colors.green, width: 2),
+      ),
+      child: Icon(icon, color: Colors.green),
     );
   }
 }

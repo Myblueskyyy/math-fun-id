@@ -69,6 +69,10 @@ flutter:
     - assets/images/welcome_screen/
     - assets/images/home_screen/
     - assets/images/vn/
+    - assets/images/frog/
+    - assets/images/frog/Die/
+    - assets/images/frog/Idle/
+    - assets/images/frog/Jump/
     - assets/images/frog_jump/
     - assets/images/characters/
     - assets/char/

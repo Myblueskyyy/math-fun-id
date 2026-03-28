@@ -5,7 +5,12 @@ import 'package:flutter/material.dart';
 class LilyPadComponent extends SpriteComponent with TapCallbacks {
   final String label;
   final int index;
+  String? optionText;
   final VoidCallback onTapDownAction;
+  
+  late TextComponent labelTextComponent;
+  late TextComponent optionTextComponent;
+  late CircleComponent labelCircle;
 
   LilyPadComponent({
     required Sprite sprite,
@@ -14,28 +19,62 @@ class LilyPadComponent extends SpriteComponent with TapCallbacks {
     required this.label,
     required this.index,
     required this.onTapDownAction,
+    this.optionText,
   }) : super(sprite: sprite, position: position, size: size, anchor: Anchor.center);
 
   @override
   Future<void> onLoad() async {
-    // Add label (A, B, or C)
-    final textPaint = TextPaint(
+    // Add green circle for the label (A, B, or C)
+    labelCircle = CircleComponent(
+      radius: 12,
+      paint: Paint()..color = Colors.green,
+      position: Vector2(size.x / 2, 0),
+      anchor: Anchor.center,
+    );
+    add(labelCircle);
+
+    final labelPaint = TextPaint(
       style: const TextStyle(
         color: Colors.white,
-        fontSize: 24,
+        fontSize: 14,
         fontWeight: FontWeight.bold,
-        shadows: [Shadow(blurRadius: 4, color: Colors.black, offset: Offset(2, 2))],
       ),
     );
-    
-    add(
-      TextComponent(
-        text: label,
-        textRenderer: textPaint,
-        position: Vector2(size.x / 2, -20),
-        anchor: Anchor.center,
+
+    labelTextComponent = TextComponent(
+      text: label,
+      textRenderer: labelPaint,
+      position: Vector2(labelCircle.size.x / 2, labelCircle.size.y / 2),
+      anchor: Anchor.center,
+    );
+    labelCircle.add(labelTextComponent);
+
+    // Option text (e.g. "Rp 260.000")
+    final optionPaint = TextPaint(
+      style: const TextStyle(
+        color: Colors.white,
+        fontSize: 18,
+        fontWeight: FontWeight.bold,
+        shadows: [
+          Shadow(blurRadius: 8, color: Colors.black, offset: Offset(2, 2)),
+          Shadow(blurRadius: 8, color: Colors.black, offset: Offset(-2, -2)),
+        ],
       ),
     );
+
+    optionTextComponent = TextComponent(
+      text: optionText ?? '',
+      textRenderer: optionPaint,
+      position: Vector2(size.x / 2, size.y / 2),
+      anchor: Anchor.center,
+      priority: 10,
+    );
+    add(optionTextComponent);
+  }
+
+  void updateText(String newText) {
+    optionText = newText;
+    optionTextComponent.text = newText;
   }
 
   @override

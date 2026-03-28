@@ -2,18 +2,27 @@ import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
 import 'package:flutter/material.dart';
 
-class FrogComponent extends SpriteComponent {
+enum FrogState { idle, jumping, dying }
+
+class FrogComponent extends SpriteAnimationGroupComponent<FrogState> {
   bool isJumping = false;
 
   FrogComponent({
-    required Sprite sprite,
+    required Map<FrogState, SpriteAnimation> animations,
     required Vector2 position,
     required Vector2 size,
-  }) : super(sprite: sprite, position: position, size: size, anchor: Anchor.center);
+  }) : super(
+          animations: animations,
+          current: FrogState.idle,
+          position: position,
+          size: size,
+          anchor: Anchor.center,
+        );
 
   void jumpTo(Vector2 targetPosition, VoidCallback onComplete) {
     if (isJumping) return;
     isJumping = true;
+    current = FrogState.jumping;
 
     // Jump effect (arc)
     final jumpPath = Path()
@@ -31,6 +40,8 @@ class FrogComponent extends SpriteComponent {
         EffectController(duration: 0.6, curve: Curves.easeInOut),
         onComplete: () {
           isJumping = false;
+          // Don't switch back to idle immediately if we are going to die or stay on lilypad
+          // The game logic will handle the next state
           onComplete();
         },
       ),
@@ -46,6 +57,7 @@ class FrogComponent extends SpriteComponent {
   }
 
   void fallInWater(VoidCallback onComplete) {
+    current = FrogState.dying;
     // Sinking effect
     add(
       SequenceEffect([
@@ -60,5 +72,6 @@ class FrogComponent extends SpriteComponent {
     opacity = 1.0;
     scale = Vector2.all(1.0);
     isJumping = false;
+    current = FrogState.idle;
   }
 }
