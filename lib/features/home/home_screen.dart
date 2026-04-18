@@ -22,7 +22,10 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    AudioController.instance.playBgm('main_bgm.mp3');
+    // Use post-frame callback to ensure BGM survives navigation transitions
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      AudioController.instance.ensureMainBgm();
+    });
   }
 
   @override

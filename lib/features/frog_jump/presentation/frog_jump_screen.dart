@@ -67,7 +67,10 @@ class _FrogJumpScreenState extends State<FrogJumpScreen> {
   @override
   void dispose() {
     gameTimer?.cancel();
-    AudioController.instance.playBgm('main_bgm.mp3');
+    // Restore main BGM after navigation completes to avoid race conditions
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      AudioController.instance.ensureMainBgm();
+    });
     super.dispose();
   }
 

@@ -6,13 +6,26 @@ class AudioController {
   static AudioController get instance => _instance;
 
   final AudioPlayer _bgmPlayer = AudioPlayer();
+  // Reusable SFX player to avoid creating/disposing players that steal audio focus
+  final AudioPlayer _sfxPlayer = AudioPlayer();
 
   String? _currentBgm;
   double _bgmVolume = 0.0;
   Timer? _fadeTimer;
 
+
   AudioController._internal() {
+    // CRITICAL: Set global audio context to mix with others.
+    // Without this, each new AudioPlayer requests audio focus on Android,
+    // which pauses/stops the BGM player.
+    AudioPlayer.global.setAudioContext(
+      AudioContextConfig(
+        focus: AudioContextConfigFocus.mixWithOthers,
+      ).build(),
+    );
+
     _bgmPlayer.setReleaseMode(ReleaseMode.loop);
+    _sfxPlayer.setReleaseMode(ReleaseMode.release);
   }
 
   // Fade parameters
@@ -20,16 +33,28 @@ class AudioController {
   static const int _fadeDurationMs = 500;
 
   Future<void> playBgm(String assetPath, {double targetVolume = 0.5}) async {
-    if (_currentBgm == assetPath) {
+    // If same BGM is requested and is actually still playing, just adjust volume
+    if (_currentBgm == assetPath &&
+        _bgmPlayer.state == PlayerState.playing) {
       if (_bgmVolume != targetVolume) {
         fadeToVolume(targetVolume);
       }
       return;
     }
 
-    // Fade out current BGM if playing
-    if (_currentBgm != null && _bgmPlayer.state == PlayerState.playing) {
+    // If same BGM is requested but player is NOT playing, restart it
+    // (handles edge cases where player stopped unexpectedly)
+
+
+
+    // Fade out current BGM if playing something different
+    if (_currentBgm != null &&
+        _currentBgm != assetPath &&
+        _bgmPlayer.state == PlayerState.playing) {
       await _fadeOut();
+    } else if (_bgmPlayer.state == PlayerState.playing) {
+      // Same BGM but somehow still flagged — stop it cleanly
+      await _bgmPlayer.stop();
     }
 
     try {
@@ -41,6 +66,12 @@ class AudioController {
     } catch (e) {
       print('Error playing BGM $assetPath: $e');
     }
+  }
+
+  /// Ensures the main BGM is playing. Call this when returning to normal screens.
+  /// This is safe to call repeatedly — it only restarts if not already playing.
+  Future<void> ensureMainBgm() async {
+    await playBgm('main_bgm.mp3');
   }
 
   Future<void> fadeToVolume(double targetVolume) async {
@@ -87,12 +118,10 @@ class AudioController {
 
   Future<void> playSfx(String assetPath) async {
     try {
-      // Generate short-lived player to prevent overlapping sfx interruption
-      final player = AudioPlayer();
-      player.onPlayerComplete.listen((_) => player.dispose());
-      // Fallback if dispose fails: destroy after somewhat safe time
-      Future.delayed(const Duration(seconds: 5), () => player.dispose());
-      await player.play(AssetSource('sounds/$assetPath'));
+      // Use the reusable SFX player — stops any previous SFX and plays the new one
+      // This avoids creating/disposing AudioPlayer instances which can steal audio focus
+      await _sfxPlayer.stop();
+      await _sfxPlayer.play(AssetSource('sounds/$assetPath'));
     } catch (e) {
       print('Error playing SFX $assetPath: $e');
     }
@@ -103,7 +132,10 @@ class AudioController {
   }
 
   void stopAll() {
+    _fadeTimer?.cancel();
     _bgmPlayer.stop();
+    _sfxPlayer.stop();
     _currentBgm = null;
+    _bgmVolume = 0.0;
   }
 }

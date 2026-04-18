@@ -70,7 +70,10 @@ class _PlatformerScreenState extends State<PlatformerScreen> {
 
   @override
   void dispose() {
-    AudioController.instance.playBgm('main_bgm.mp3');
+    // Restore main BGM after navigation completes to avoid race conditions
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      AudioController.instance.ensureMainBgm();
+    });
     super.dispose();
   }
 

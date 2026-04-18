@@ -54,7 +54,10 @@ class _QuizScreenState extends State<QuizScreen> {
     _provider?.removeListener(_onProviderUpdate);
     // Reset orientation to default (landscape) when leaving quiz
     DeviceUtils.resetToDefault();
-    AudioController.instance.playBgm('main_bgm.mp3');
+    // Restore main BGM after navigation completes to avoid race conditions
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      AudioController.instance.ensureMainBgm();
+    });
     super.dispose();
   }
 

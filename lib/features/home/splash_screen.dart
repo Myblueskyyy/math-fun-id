@@ -14,7 +14,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    AudioController.instance.playBgm('main_bgm.mp3');
+    AudioController.instance.ensureMainBgm();
     // Navigate to WelcomeScreen after 3 seconds
     Future.delayed(const Duration(seconds: 3), () {
       if (mounted) {
