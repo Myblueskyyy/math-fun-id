@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'welcome_screen.dart';
 import '../../core/widgets/bubbly_background.dart';
+import '../../core/utils/audio_controller.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -13,6 +14,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
+    AudioController.instance.playBgm('main_bgm.mp3');
     // Navigate to WelcomeScreen after 3 seconds
     Future.delayed(const Duration(seconds: 3), () {
       if (mounted) {

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flame/game.dart';
 import '../frog_jump_game.dart';
 import '../../platformer/domain/question.dart';
+import '../../../core/utils/audio_controller.dart';
 
 class FrogJumpScreen extends StatefulWidget {
   const FrogJumpScreen({super.key});
@@ -59,12 +60,14 @@ class _FrogJumpScreenState extends State<FrogJumpScreen> {
   @override
   void initState() {
     super.initState();
+    AudioController.instance.playBgm('frog_bgm.mp3');
     _initGame();
   }
 
   @override
   void dispose() {
     gameTimer?.cancel();
+    AudioController.instance.playBgm('main_bgm.mp3');
     super.dispose();
   }
 
@@ -145,11 +148,13 @@ class _FrogJumpScreenState extends State<FrogJumpScreen> {
 
     game.jumpToLilyPad(index, isCorrect, () {
       if (isCorrect) {
+        AudioController.instance.playSfx('correct_answer.mp3');
         setState(() {
           score += 25;
           showDiscussion = true;
         });
       } else {
+        AudioController.instance.playSfx('wrong_answer.mp3');
         setState(() {
           lives--;
         });
@@ -179,6 +184,7 @@ class _FrogJumpScreenState extends State<FrogJumpScreen> {
 
   void _showGameOver({bool isWin = false}) {
     gameTimer?.cancel();
+    AudioController.instance.playSfx(isWin ? 'stage_win.mp3' : 'stage_lose.mp3');
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -188,6 +194,7 @@ class _FrogJumpScreenState extends State<FrogJumpScreen> {
         actions: [
           TextButton(
             onPressed: () {
+              AudioController.instance.playButtonClick();
               Navigator.pop(context);
               Navigator.pop(context);
             },
@@ -195,6 +202,7 @@ class _FrogJumpScreenState extends State<FrogJumpScreen> {
           ),
           ElevatedButton(
             onPressed: () {
+              AudioController.instance.playButtonClick();
               Navigator.pop(context);
               setState(() {
                 lives = 3;
@@ -232,7 +240,10 @@ class _FrogJumpScreenState extends State<FrogJumpScreen> {
               bottom: 20,
               left: 20,
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.5),
                   borderRadius: BorderRadius.circular(20),
@@ -254,7 +265,10 @@ class _FrogJumpScreenState extends State<FrogJumpScreen> {
               bottom: 20,
               right: 20,
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.black.withOpacity(0.5),
                   borderRadius: BorderRadius.circular(20),
@@ -277,7 +291,10 @@ class _FrogJumpScreenState extends State<FrogJumpScreen> {
               top: 10,
               left: 10,
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 4,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.green.withOpacity(0.8),
                   borderRadius: BorderRadius.circular(10),
@@ -299,7 +316,10 @@ class _FrogJumpScreenState extends State<FrogJumpScreen> {
               top: 10,
               right: 60,
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.8),
                   borderRadius: BorderRadius.circular(15),
@@ -322,7 +342,9 @@ class _FrogJumpScreenState extends State<FrogJumpScreen> {
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color: secondsRemaining < 30 ? Colors.red : Colors.black,
+                        color: secondsRemaining < 30
+                            ? Colors.red
+                            : Colors.black,
                       ),
                     ),
                   ],
@@ -402,7 +424,10 @@ class _FrogJumpScreenState extends State<FrogJumpScreen> {
                             ),
                             elevation: 8,
                           ),
-                          onPressed: _startCountdown,
+                          onPressed: () {
+                            AudioController.instance.playButtonClick();
+                            _startCountdown();
+                          },
                           child: const Text(
                             'Mulai Bermain!',
                             style: TextStyle(
@@ -493,7 +518,10 @@ class _FrogJumpScreenState extends State<FrogJumpScreen> {
                           ),
                           const SizedBox(height: 32),
                           ElevatedButton(
-                            onPressed: _nextQuestion,
+                            onPressed: () {
+                              AudioController.instance.playButtonClick();
+                              _nextQuestion();
+                            },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.green,
                               shape: RoundedRectangleBorder(

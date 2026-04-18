@@ -4,9 +4,33 @@ import '../../core/constants/app_colors.dart';
 import '../../core/widgets/bubbly_background.dart';
 import '../../shared/widgets/custom_card.dart';
 import '../quiz/quiz_provider.dart';
+import '../../core/utils/audio_controller.dart';
 
-class EvaluasiScreen extends StatelessWidget {
+class EvaluasiScreen extends StatefulWidget {
   const EvaluasiScreen({super.key});
+
+  @override
+  State<EvaluasiScreen> createState() => _EvaluasiScreenState();
+}
+
+class _EvaluasiScreenState extends State<EvaluasiScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final provider = context.read<QuizProvider>();
+      final preTestScore = provider.preTestScore;
+      final postTestScore = provider.postTestScore;
+
+      if (preTestScore != null && postTestScore != null) {
+        if (postTestScore > preTestScore) {
+          AudioController.instance.playSfx('stage_win.mp3');
+        } else if (postTestScore < preTestScore) {
+          AudioController.instance.playSfx('stage_lose.mp3');
+        }
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -203,3 +227,4 @@ class EvaluasiScreen extends StatelessWidget {
     );
   }
 }
+

@@ -3,6 +3,7 @@ import 'package:flame/collisions.dart';
 import 'ground.dart';
 import 'question_item.dart';
 import '../platformer_game.dart';
+import '../../../core/utils/audio_controller.dart';
 
 enum PlayerState { idle, walk, jump }
 
@@ -109,6 +110,7 @@ class Player extends SpriteAnimationGroupComponent<PlayerState> with CollisionCa
       velocity.y = jumpSpeed;
       jumpsRemaining--;
       isOnGround = false;
+      AudioController.instance.playSfx('jump_mario.mp3');
     }
   }
 

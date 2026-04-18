@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../utils/audio_controller.dart';
 
 class BubblyButton extends StatelessWidget {
   final String title;
@@ -30,7 +31,10 @@ class BubblyButton extends StatelessWidget {
     final double paddingHoriz = isFullWidth ? 24 : 8;
 
     return GestureDetector(
-      onTap: onTap,
+      onTap: () {
+        AudioController.instance.playButtonClick();
+        onTap();
+      },
       child: Container(
         margin:
             margin ?? const EdgeInsets.symmetric(horizontal: 6, vertical: 8),

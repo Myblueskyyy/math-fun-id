@@ -7,6 +7,7 @@ import '../../core/widgets/bubbly_background.dart';
 import 'visual_novel/data/story_data.dart';
 import 'visual_novel/models/story_node.dart';
 import 'visual_novel/presentation/vn_screen.dart';
+import '../../core/utils/audio_controller.dart';
 
 class MateriDetailScreen extends StatefulWidget {
   final Materi materi;
@@ -112,7 +113,10 @@ class _MateriDetailScreenState extends State<MateriDetailScreen> {
               ),
               elevation: 4,
             ),
-            onPressed: () => _launchVisualNovel(context, widget.materi.title),
+            onPressed: () {
+              AudioController.instance.playButtonClick();
+              _launchVisualNovel(context, widget.materi.title);
+            },
             icon: const Icon(Icons.videogame_asset_rounded, size: 28),
             label: const Text(
               'Mainkan Cerita Interaktif',

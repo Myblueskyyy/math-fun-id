@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../../../core/constants/app_colors.dart';
+import '../../../../core/utils/audio_controller.dart';
 
 class JualBeliSimulation extends StatefulWidget {
   const JualBeliSimulation({super.key});
@@ -122,7 +123,10 @@ class _JualBeliSimulationState extends State<JualBeliSimulation>
           ),
           const SizedBox(height: 16),
           ElevatedButton(
-            onPressed: _calculate,
+            onPressed: () {
+              AudioController.instance.playButtonClick();
+              _calculate();
+            },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.blue,
               foregroundColor: Colors.white,

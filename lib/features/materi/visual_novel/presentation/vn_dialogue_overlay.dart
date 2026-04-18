@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../models/story_node.dart';
+import '../../../../core/utils/audio_controller.dart';
 
 class VnDialogueOverlay extends StatelessWidget {
   final StoryNode node;
@@ -24,7 +25,10 @@ class VnDialogueOverlay extends StatelessWidget {
                 node.interactionType == InteractionType.imageDisplay ||
                 node.interactionType == InteractionType.strukDigital))
           GestureDetector(
-            onTap: onNext,
+            onTap: () {
+              AudioController.instance.playButtonClick();
+              onNext();
+            },
             behavior: HitTestBehavior.opaque,
             child: Container(
               color: Colors.transparent,
@@ -68,7 +72,10 @@ class VnDialogueOverlay extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(12),
                               ),
                             ),
-                            onPressed: () => onChoiceSelected(choice),
+                            onPressed: () {
+                            AudioController.instance.playButtonClick();
+                            onChoiceSelected(choice);
+                          },
                             child: Text(
                               choice.text,
                               style: GoogleFonts.inter(
@@ -223,7 +230,10 @@ class VnDialogueOverlay extends StatelessWidget {
                     ),
                     elevation: 4,
                   ),
-                  onPressed: () => onChoiceSelected(choice),
+                  onPressed: () {
+                            AudioController.instance.playButtonClick();
+                            onChoiceSelected(choice);
+                          },
                   child: Text(
                     choice.text,
                     style: GoogleFonts.inter(
@@ -250,7 +260,10 @@ class VnDialogueOverlay extends StatelessWidget {
           final choice = node.choices[index];
           final color = colors[index % colors.length];
           return GestureDetector(
-            onTap: () => onChoiceSelected(choice),
+            onTap: () {
+                            AudioController.instance.playButtonClick();
+                            onChoiceSelected(choice);
+                          },
             child: Container(
               width: MediaQuery.of(context).size.width * 0.28,
               height: 200,
@@ -355,7 +368,10 @@ class VnDialogueOverlay extends StatelessWidget {
                               borderRadius: BorderRadius.circular(8),
                             ),
                           ),
-                          onPressed: () => onChoiceSelected(choice),
+                          onPressed: () {
+                            AudioController.instance.playButtonClick();
+                            onChoiceSelected(choice);
+                          },
                           child: Text(choice.text),
                         ),
                       ),
@@ -392,7 +408,10 @@ class VnDialogueOverlay extends StatelessWidget {
           final isUntung = choice.text == 'UNTUNG';
           final color = isUntung ? Colors.amber.shade600 : Colors.blue.shade900;
           return GestureDetector(
-            onTap: () => onChoiceSelected(choice),
+            onTap: () {
+                            AudioController.instance.playButtonClick();
+                            onChoiceSelected(choice);
+                          },
             child: Container(
               width: 160,
               height: 160,
@@ -530,7 +549,10 @@ class VnDialogueOverlay extends StatelessWidget {
     bool isLeft,
   ) {
     return GestureDetector(
-      onTap: () => onChoiceSelected(choice),
+      onTap: () {
+                            AudioController.instance.playButtonClick();
+                            onChoiceSelected(choice);
+                          },
       child: Container(
         width: 150,
         padding: const EdgeInsets.all(12),

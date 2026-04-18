@@ -5,11 +5,34 @@ import '../../core/widgets/bubbly_background.dart';
 import '../../core/widgets/bubbly_button.dart';
 import '../../shared/widgets/custom_card.dart';
 import 'quiz_provider.dart';
+import '../../core/utils/audio_controller.dart';
 
-class ResultScreen extends StatelessWidget {
+class ResultScreen extends StatefulWidget {
   final String title;
 
   const ResultScreen({super.key, required this.title});
+
+  @override
+  State<ResultScreen> createState() => _ResultScreenState();
+}
+
+class _ResultScreenState extends State<ResultScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final provider = context.read<QuizProvider>();
+      final totalQuestions = provider.questions.length;
+      final correctAnswers = provider.correctAnswersCount;
+      
+      // Consider it a "win" if score is more than 60%
+      if (totalQuestions > 0 && (correctAnswers / totalQuestions) >= 0.6) {
+        AudioController.instance.playSfx('stage_win.mp3');
+      } else {
+        AudioController.instance.playSfx('stage_lose.mp3');
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +60,7 @@ class ResultScreen extends StatelessWidget {
                     const SizedBox(height: 32),
                     Align(
                       alignment: Alignment.centerLeft,
-                      child: Text(
+                      child: const Text(
                         'Pembahasan Soal',
                         style: TextStyle(
                           fontSize: 18,
@@ -143,7 +166,7 @@ class ResultScreen extends StatelessWidget {
                 const SizedBox(width: 12),
                 Text(
                   'Soal ${index + 1}',
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     color: Colors.black,
                   ),
@@ -187,7 +210,7 @@ class ResultScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  const Text(
                     'Pembahasan:',
                     style: TextStyle(
                       fontSize: 12,
@@ -198,7 +221,7 @@ class ResultScreen extends StatelessWidget {
                   const SizedBox(height: 4),
                   Text(
                     question.explanation,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 14,
                       fontStyle: FontStyle.italic,
                       color: Colors.black87,
@@ -213,3 +236,4 @@ class ResultScreen extends StatelessWidget {
     );
   }
 }
+

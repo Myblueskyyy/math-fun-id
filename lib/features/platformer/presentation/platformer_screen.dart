@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flame/game.dart';
 import '../platformer_game.dart';
 import '../domain/question.dart';
+import '../../../core/utils/audio_controller.dart';
 
 class PlatformerScreen extends StatefulWidget {
   const PlatformerScreen({Key? key}) : super(key: key);
@@ -63,7 +64,14 @@ class _PlatformerScreenState extends State<PlatformerScreen> {
   @override
   void initState() {
     super.initState();
+    AudioController.instance.playBgm('mario_bgm.mp3');
     _initGame();
+  }
+
+  @override
+  void dispose() {
+    AudioController.instance.playBgm('main_bgm.mp3');
+    super.dispose();
   }
 
   void _initGame() {
@@ -81,6 +89,7 @@ class _PlatformerScreenState extends State<PlatformerScreen> {
   }
 
   void _showEndDialog({required bool isWin}) {
+    AudioController.instance.playSfx(isWin ? 'stage_win.mp3' : 'stage_lose.mp3');
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -104,6 +113,7 @@ class _PlatformerScreenState extends State<PlatformerScreen> {
         actions: [
           TextButton(
             onPressed: () {
+              AudioController.instance.playButtonClick();
               Navigator.pop(context); // Close dialog
               Navigator.pop(context); // Back to previous menu
             },
@@ -111,6 +121,7 @@ class _PlatformerScreenState extends State<PlatformerScreen> {
           ),
           ElevatedButton(
             onPressed: () {
+              AudioController.instance.playButtonClick();
               Navigator.pop(context);
               _restartGame();
             },
@@ -137,6 +148,7 @@ class _PlatformerScreenState extends State<PlatformerScreen> {
     if (activeQuestionIndex == null) return;
 
     if (optionIndex == questions[activeQuestionIndex!].correctIndex) {
+      AudioController.instance.playSfx('correct_answer.mp3');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Jawaban Benar! (+25 Skor)'),
@@ -150,6 +162,7 @@ class _PlatformerScreenState extends State<PlatformerScreen> {
         showDiscussion = true;
       });
     } else {
+      AudioController.instance.playSfx('wrong_answer.mp3');
       setState(() {
         lives--;
       });
@@ -419,7 +432,10 @@ class _PlatformerScreenState extends State<PlatformerScreen> {
                   vertical: 12,
                 ),
               ),
-              onPressed: () => _answerQuestion(idx),
+              onPressed: () {
+                AudioController.instance.playButtonClick();
+                _answerQuestion(idx);
+              },
               child: Text(questions[activeQuestionIndex!].options[idx]),
             ),
           ),
@@ -427,6 +443,7 @@ class _PlatformerScreenState extends State<PlatformerScreen> {
         const SizedBox(height: 24),
         TextButton.icon(
           onPressed: () {
+            AudioController.instance.playButtonClick();
             setState(() {
               showDiscussion = true;
             });
@@ -470,7 +487,10 @@ class _PlatformerScreenState extends State<PlatformerScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
             backgroundColor: Colors.amber,
           ),
-          onPressed: _continueGameAfterDiscussion,
+          onPressed: () {
+            AudioController.instance.playButtonClick();
+            _continueGameAfterDiscussion();
+          },
           child: const Text(
             'Lanjutkan Petualangan!',
             style: TextStyle(

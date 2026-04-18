@@ -6,6 +6,7 @@ import '../../core/utils/device_utils.dart';
 import '../../shared/widgets/custom_card.dart';
 import 'quiz_provider.dart';
 import 'result_screen.dart';
+import '../../core/utils/audio_controller.dart';
 
 class QuizScreen extends StatefulWidget {
   final String title;
@@ -32,6 +33,8 @@ class _QuizScreenState extends State<QuizScreen> {
       if (DeviceUtils.isPhone(context)) {
         DeviceUtils.forcePortrait();
       }
+      
+      AudioController.instance.playBgm('test_bgm.mp3', targetVolume: 0.2);
     });
   }
 
@@ -51,6 +54,7 @@ class _QuizScreenState extends State<QuizScreen> {
     _provider?.removeListener(_onProviderUpdate);
     // Reset orientation to default (landscape) when leaving quiz
     DeviceUtils.resetToDefault();
+    AudioController.instance.playBgm('main_bgm.mp3');
     super.dispose();
   }
 
@@ -273,6 +277,7 @@ class _QuizScreenState extends State<QuizScreen> {
       child: GestureDetector(
         onTap: () {
           if (userAnswer == null) {
+            AudioController.instance.playButtonClick();
             provider.answerQuestion(index);
           }
         },

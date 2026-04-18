@@ -10,6 +10,7 @@ import 'simulations/pajak_simulation.dart';
 import 'visual_illustrations/apple_illustration.dart';
 import 'visual_illustrations/market_illustration.dart';
 import 'materi_detail_screen.dart';
+import '../../core/utils/audio_controller.dart';
 
 final List<Materi> listMateri = [
   Materi(
@@ -128,12 +129,15 @@ class MateriListScreen extends StatelessWidget {
               return Padding(
                 padding: const EdgeInsets.only(bottom: 16.0),
                 child: CustomCard(
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => MateriDetailScreen(materi: materi),
-                    ),
-                  ),
+                  onTap: () {
+                    AudioController.instance.playButtonClick();
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => MateriDetailScreen(materi: materi),
+                      ),
+                    );
+                  },
                   color: Colors.white,
                   child: Row(
                     children: [

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'home_screen.dart';
 import 'intro_screen.dart';
 import '../../core/widgets/bubbly_background.dart';
+import '../../core/utils/audio_controller.dart';
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
@@ -72,6 +73,7 @@ class WelcomeScreen extends StatelessWidget {
                         // Question / Intro Button
                         InkWell(
                           onTap: () {
+                            AudioController.instance.playButtonClick();
                             Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -95,6 +97,7 @@ class WelcomeScreen extends StatelessWidget {
                         // Custom Play Button Image
                         InkWell(
                           onTap: () {
+                            AudioController.instance.playButtonClick();
                             Navigator.of(context).pushReplacement(
                               MaterialPageRoute(
                                 builder: (_) => const HomeScreen(),

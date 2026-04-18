@@ -9,9 +9,21 @@ import '../evaluasi/evaluasi_screen.dart';
 import '../../core/widgets/bubbly_background.dart';
 import '../platformer/presentation/platformer_screen.dart';
 import '../frog_jump/presentation/frog_jump_screen.dart';
+import '../../core/utils/audio_controller.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  @override
+  void initState() {
+    super.initState();
+    AudioController.instance.playBgm('main_bgm.mp3');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,6 +47,7 @@ class HomeScreen extends StatelessWidget {
                         Flexible(
                           child: InkWell(
                             onTap: () {
+                              AudioController.instance.playButtonClick();
                               final provider = Provider.of<QuizProvider>(
                                 context,
                                 listen: false,
@@ -62,6 +75,7 @@ class HomeScreen extends StatelessWidget {
                         Flexible(
                           child: InkWell(
                             onTap: () {
+                              AudioController.instance.playButtonClick();
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
@@ -86,6 +100,7 @@ class HomeScreen extends StatelessWidget {
                         Flexible(
                           child: InkWell(
                             onTap: () {
+                              AudioController.instance.playButtonClick();
                               final provider = Provider.of<QuizProvider>(
                                 context,
                                 listen: false,
@@ -112,6 +127,7 @@ class HomeScreen extends StatelessWidget {
                         Flexible(
                           child: InkWell(
                             onTap: () {
+                              AudioController.instance.playButtonClick();
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
@@ -142,6 +158,7 @@ class HomeScreen extends StatelessWidget {
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                           ),
                           onPressed: () {
+                            AudioController.instance.playButtonClick();
                             Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -162,6 +179,7 @@ class HomeScreen extends StatelessWidget {
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                           ),
                           onPressed: () {
+                            AudioController.instance.playButtonClick();
                             Navigator.push(
                               context,
                               MaterialPageRoute(

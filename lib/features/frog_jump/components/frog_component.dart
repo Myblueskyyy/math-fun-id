@@ -1,6 +1,7 @@
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
 import 'package:flutter/material.dart';
+import '../../../core/utils/audio_controller.dart';
 
 enum FrogState { idle, jumping, dying }
 
@@ -23,6 +24,7 @@ class FrogComponent extends SpriteAnimationGroupComponent<FrogState> {
     if (isJumping) return;
     isJumping = true;
     current = FrogState.jumping;
+    AudioController.instance.playSfx('jump_frog.mp3');
 
     // Jump effect (arc)
     final jumpPath = Path()
@@ -58,6 +60,7 @@ class FrogComponent extends SpriteAnimationGroupComponent<FrogState> {
 
   void fallInWater(VoidCallback onComplete) {
     current = FrogState.dying;
+    AudioController.instance.playSfx('frog_fall_watersplash.mp3');
     // Sinking effect
     add(
       SequenceEffect([

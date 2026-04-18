@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../shared/models/question.dart';
+import '../../core/utils/audio_controller.dart';
 
 enum QuizType { preTest, postTest, simulation }
 
@@ -70,6 +71,9 @@ class QuizProvider extends ChangeNotifier {
 
     if (isCorrect) {
       _correctAnswersCount++;
+      AudioController.instance.playSfx('correct_answer.mp3');
+    } else {
+      AudioController.instance.playSfx('wrong_answer.mp3');
     }
 
     _isProcessingFeedback = true;
