@@ -13,6 +13,7 @@ class Materi {
   // New Visual Learning Properties
   final String? caseStudy;
   final Widget Function(BuildContext)? visualIllustrationWidget;
+  final String? voiceOverPath;
 
   Materi({
     required this.title,
@@ -25,6 +26,7 @@ class Materi {
     this.interactiveWidget,
     this.caseStudy,
     this.visualIllustrationWidget,
+    this.voiceOverPath,
   });
 }
 

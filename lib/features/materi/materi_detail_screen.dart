@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import '../../core/constants/app_colors.dart';
 import '../../shared/models/materi.dart';
 import '../../shared/widgets/custom_card.dart';
@@ -18,7 +17,56 @@ class MateriDetailScreen extends StatefulWidget {
   State<MateriDetailScreen> createState() => _MateriDetailScreenState();
 }
 
-class _MateriDetailScreenState extends State<MateriDetailScreen> {
+class _MateriDetailScreenState extends State<MateriDetailScreen>
+    with SingleTickerProviderStateMixin {
+  bool isVoPlaying = false;
+  bool showCharacter = true;
+  late AnimationController _floatingController;
+
+  @override
+  void initState() {
+    super.initState();
+    _floatingController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 2),
+    )..repeat(reverse: true);
+    _startVO();
+  }
+
+  @override
+  void dispose() {
+    _floatingController.dispose();
+    AudioController.instance.stopSfx();
+    super.dispose();
+  }
+
+  void _startVO() {
+    if (widget.materi.voiceOverPath != null) {
+      setState(() {
+        isVoPlaying = true;
+      });
+      AudioController.instance.playSfx(widget.materi.voiceOverPath!);
+    }
+  }
+
+  void _toggleVO() {
+    if (isVoPlaying) {
+      AudioController.instance.stopSfx();
+      setState(() {
+        isVoPlaying = false;
+      });
+    } else {
+      _startVO();
+    }
+  }
+
+  String _getCharacterImage() {
+    if (widget.materi.title == 'Jual-Beli' || widget.materi.title == 'Diskon') {
+      return 'assets/images/anis.png';
+    }
+    return 'assets/images/angga.png';
+  }
+
   @override
   Widget build(BuildContext context) {
     return _buildScaffold(context);
@@ -28,49 +76,122 @@ class _MateriDetailScreenState extends State<MateriDetailScreen> {
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: BubblyBackground(
-        child: CustomScrollView(
-          physics: const BouncingScrollPhysics(),
-          slivers: [
-            SliverAppBar(
-              expandedHeight: 150.0,
-              pinned: true,
-              flexibleSpace: FlexibleSpaceBar(
-                title: Text(
-                  widget.materi.title,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-                background: Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    Image.asset(
-                      "assets/images/bg-appbar.png",
-                      fit: BoxFit.cover,
-                    ),
-                    Container(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [
-                            Colors.transparent,
-                            widget.materi.color.withOpacity(0.8),
-                          ],
+        child: Stack(
+          children: [
+            CustomScrollView(
+              physics: const BouncingScrollPhysics(),
+              slivers: [
+                SliverAppBar(
+                  expandedHeight: 150.0,
+                  pinned: true,
+                  actions: [
+                    if (widget.materi.voiceOverPath != null)
+                      Padding(
+                        padding: const EdgeInsets.only(right: 16.0),
+                        child: CircleAvatar(
+                          backgroundColor: Colors.white.withValues(alpha: 0.9),
+                          child: IconButton(
+                            icon: Icon(
+                              isVoPlaying
+                                  ? Icons.volume_up_rounded
+                                  : Icons.volume_off_rounded,
+                              color: widget.materi.color,
+                            ),
+                            onPressed: _toggleVO,
+                          ),
                         ),
                       ),
-                    ),
                   ],
+                  flexibleSpace: FlexibleSpaceBar(
+                    title: Text(
+                      widget.materi.title,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    background: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        Image.asset(
+                          "assets/images/bg-appbar.png",
+                          fit: BoxFit.cover,
+                        ),
+                        Container(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [
+                                Colors.transparent,
+                                widget.materi.color.withValues(alpha: 0.8),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                SliverPadding(
+                  padding: const EdgeInsets.all(24.0),
+                  sliver: SliverList(
+                    delegate: SliverChildListDelegate([..._buildContent(context)]),
+                  ),
+                ),
+              ],
+            ),
+            // Floating Character
+            if (showCharacter)
+              Positioned(
+                bottom: 20,
+                right: 20,
+                child: AnimatedBuilder(
+                  animation: _floatingController,
+                  builder: (context, child) {
+                    return Transform.translate(
+                      offset: Offset(0, -10 * _floatingController.value),
+                      child: child,
+                    );
+                  },
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      Container(
+                        height: 200,
+                        constraints: const BoxConstraints(maxWidth: 150),
+                        child: Image.asset(
+                          _getCharacterImage(),
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                      Positioned(
+                        top: -5,
+                        right: -5,
+                        child: GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              showCharacter = false;
+                            });
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.all(2),
+                            decoration: const BoxDecoration(
+                              color: Colors.red,
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.close,
+                              color: Colors.white,
+                              size: 18,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-            SliverPadding(
-              padding: const EdgeInsets.all(24.0),
-              sliver: SliverList(
-                delegate: SliverChildListDelegate([..._buildContent(context)]),
-              ),
-            ),
           ],
         ),
       ),

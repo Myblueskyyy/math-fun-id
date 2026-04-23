@@ -127,6 +127,10 @@ class AudioController {
     }
   }
 
+  Future<void> stopSfx() async {
+    await _sfxPlayer.stop();
+  }
+
   Future<void> playButtonClick() async {
     await playSfx('button_click.mp3');
   }

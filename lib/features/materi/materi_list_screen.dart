@@ -35,6 +35,7 @@ final List<Materi> listMateri = [
     caseStudy:
         'Budi pergi ke pasar grosir dan membeli sekarung beras seharga Rp 250.000 (Harga Beli). Kemudian, Budi mengemas beras tersebut ke dalam kemasan kecil dan total hasil penjualannya mencapai Rp 300.000 (Harga Jual) di warungnya.',
     visualIllustrationWidget: (context) => const MarketVisualIllustration(),
+    voiceOverPath: 'voice-over/anis1.mp3',
   ),
   Materi(
     title: 'Untung-Rugi',
@@ -59,6 +60,7 @@ final List<Materi> listMateri = [
         'Pak Rahmat membeli sepeda bekas seharga Rp 500.000. Ia memperbaiki sepedanya dengan biaya Rp 100.000 (total modal/harga beli riil Rp 600.000). Sebulan kemudian, pak Rahmat menjual sepedanya seharga Rp 750.000. Artinya pak Rahmat mendapat keuntungan sebesar Rp 150.000.',
     visualIllustrationWidget: (context) =>
         const AppleAdditionIllustration(), // Re-using as simple addition logic visually
+    voiceOverPath: 'voice-over/angga1.wav',
   ),
   Materi(
     title: 'Diskon',
@@ -81,6 +83,7 @@ final List<Materi> listMateri = [
     interactiveWidget: (context) => const DiskonSimulation(),
     caseStudy:
         'Jelang hari raya, toko pakaian X memberikan diskon besar-besaran "Flash Sale 50%". Siti melihat baju yang awalnya dilabeli Rp 200.000. Karena diskon tersebut, Siti hanya perlu membayar separuhnya, yakni Rp 100.000 di kasir.',
+    voiceOverPath: 'voice-over/anis2.mp3',
   ),
   Materi(
     title: 'Pajak',
@@ -102,6 +105,7 @@ final List<Materi> listMateri = [
     interactiveWidget: (context) => const PajakSimulation(),
     caseStudy:
         'Keluarga Andi makan malam di sebuah restoran populer. Total pesanan makanan mereka di menu adalah Rp 400.000. Saat membayar, ternyata tertera PPN 11% dari pemerintah. Andi pun harus membayar ekstra tambahan Rp 44.000 sehingga total yang digesek ke kartu adalah Rp 444.000.',
+    voiceOverPath: 'voice-over/angga2.wav',
   ),
 ];
 
