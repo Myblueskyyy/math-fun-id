@@ -79,7 +79,7 @@ class QuizProvider extends ChangeNotifier {
     _isProcessingFeedback = true;
     notifyListeners();
 
-    await Future.delayed(const Duration(milliseconds: 1500));
+    await Future.delayed(const Duration(milliseconds: 2200));
     _proceedToNextState();
   }
 

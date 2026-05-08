@@ -41,6 +41,7 @@ dependencies:
   flutter_email_sender: ^8.0.0
   flame: ^1.35.1
   audioplayers: ^6.6.0
+  confetti: ^0.8.0
 
 dev_dependencies:
   flutter_test:
@@ -82,6 +83,7 @@ flutter:
     - assets/char/Walk/
     - assets/clouds/
     - assets/sounds/
+    - assets/sounds/voice-over/
     - assets/tiles/
     - assets/star.png
 

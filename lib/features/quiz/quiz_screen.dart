@@ -1,5 +1,7 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:confetti/confetti.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/widgets/bubbly_background.dart';
 import '../../core/utils/device_utils.dart';
@@ -17,30 +19,98 @@ class QuizScreen extends StatefulWidget {
   State<QuizScreen> createState() => _QuizScreenState();
 }
 
-class _QuizScreenState extends State<QuizScreen> {
+class _QuizScreenState extends State<QuizScreen>
+    with TickerProviderStateMixin {
   QuizProvider? _provider;
   bool _navigated = false;
+
+  // Confetti controller for correct answers
+  late ConfettiController _confettiController;
+
+  // Animation for feedback popup
+  late AnimationController _popupAnimController;
+  late Animation<double> _popupScaleAnim;
+  late Animation<double> _popupOpacityAnim;
+
+  // Track whether we're showing a feedback popup
+  bool _showingFeedback = false;
+  bool? _lastAnswerCorrect;
+  bool _lastAnswerTimeout = false;
 
   @override
   void initState() {
     super.initState();
-    // Add post frame callback to safely add the listener and check orientation
+
+    _confettiController =
+        ConfettiController(duration: const Duration(seconds: 2));
+
+    _popupAnimController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 400),
+    );
+
+    _popupScaleAnim = Tween<double>(begin: 0.3, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _popupAnimController,
+        curve: Curves.elasticOut,
+      ),
+    );
+
+    _popupOpacityAnim = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _popupAnimController,
+        curve: const Interval(0.0, 0.3, curve: Curves.easeIn),
+      ),
+    );
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _provider = context.read<QuizProvider>();
       _provider?.addListener(_onProviderUpdate);
 
-      // Force portrait if on phone
       if (DeviceUtils.isPhone(context)) {
         DeviceUtils.forcePortrait();
       }
-      
+
       AudioController.instance.playBgm('test_bgm.mp3', targetVolume: 0.2);
     });
   }
 
   void _onProviderUpdate() {
     if (!mounted) return;
-    if (_provider?.isCompleted == true && !_navigated) {
+
+    final provider = _provider;
+    if (provider == null) return;
+
+    // Check if the provider just entered feedback mode
+    if (provider.isProcessingFeedback && !_showingFeedback) {
+      final userAnswer = provider.userAnswers[provider.currentIndex];
+      final isCorrect =
+          userAnswer == provider.currentQuestion.correctAnswerIndex;
+      final isTimeout = userAnswer == -1;
+
+      setState(() {
+        _showingFeedback = true;
+        _lastAnswerCorrect = isCorrect;
+        _lastAnswerTimeout = isTimeout;
+      });
+
+      _popupAnimController.forward(from: 0.0);
+
+      if (isCorrect) {
+        _confettiController.play();
+      }
+    }
+
+    // Check if provider exited feedback mode (moving to next question)
+    if (!provider.isProcessingFeedback && _showingFeedback) {
+      setState(() {
+        _showingFeedback = false;
+      });
+      _popupAnimController.reset();
+      _confettiController.stop();
+    }
+
+    if (provider.isCompleted && !_navigated) {
       _navigated = true;
       Navigator.pushReplacement(
         context,
@@ -52,9 +122,9 @@ class _QuizScreenState extends State<QuizScreen> {
   @override
   void dispose() {
     _provider?.removeListener(_onProviderUpdate);
-    // Reset orientation to default (landscape) when leaving quiz
+    _confettiController.dispose();
+    _popupAnimController.dispose();
     DeviceUtils.resetToDefault();
-    // Restore main BGM after navigation completes to avoid race conditions
     WidgetsBinding.instance.addPostFrameCallback((_) {
       AudioController.instance.ensureMainBgm();
     });
@@ -130,8 +200,6 @@ class _QuizScreenState extends State<QuizScreen> {
                                   (index) =>
                                       _buildOption(context, provider, index),
                                 ),
-                                if (provider.isProcessingFeedback)
-                                  _buildFeedbackOverlay(provider),
                               ],
                             ),
                           ),
@@ -141,6 +209,7 @@ class _QuizScreenState extends State<QuizScreen> {
                   ),
                 ),
               ),
+              // Character overlays
               if (provider.currentQuizType == QuizType.preTest)
                 Positioned(
                   right: 20,
@@ -192,6 +261,33 @@ class _QuizScreenState extends State<QuizScreen> {
                     ),
                   ),
                 ),
+
+              // Feedback popup overlay
+              if (_showingFeedback) _buildFeedbackPopup(),
+
+              // Confetti overlay — on top of everything
+              Align(
+                alignment: Alignment.topCenter,
+                child: ConfettiWidget(
+                  confettiController: _confettiController,
+                  blastDirection: pi / 2, // downward
+                  maxBlastForce: 20,
+                  minBlastForce: 8,
+                  emissionFrequency: 0.05,
+                  numberOfParticles: 25,
+                  gravity: 0.2,
+                  shouldLoop: false,
+                  colors: const [
+                    Colors.green,
+                    Colors.blue,
+                    Colors.pink,
+                    Colors.orange,
+                    Colors.purple,
+                    Colors.yellow,
+                    Colors.cyan,
+                  ],
+                ),
+              ),
             ],
           ),
         );
@@ -199,53 +295,172 @@ class _QuizScreenState extends State<QuizScreen> {
     );
   }
 
-  Widget _buildFeedbackOverlay(QuizProvider provider) {
-    final userAnswer = provider.userAnswers[provider.currentIndex];
-    final isCorrect = userAnswer == provider.currentQuestion.correctAnswerIndex;
-    final isTimeout = userAnswer == -1;
-
-    Color color;
+  Widget _buildFeedbackPopup() {
+    // Determine feedback content
+    String title;
+    String subtitle;
     IconData icon;
-    String text;
+    Color primaryColor;
+    Color bgColor;
+    List<Color> gradientColors;
 
-    if (isTimeout) {
-      color = Colors.orange;
+    if (_lastAnswerTimeout) {
+      title = "Waktu Habis! ⏰";
+      subtitle = "Jangan khawatir, coba lebih cepat di soal berikutnya ya!";
       icon = Icons.timer_off_rounded;
-      text = "Waktu Habis!";
-    } else if (isCorrect) {
-      color = Colors.green;
-      icon = Icons.check_circle_rounded;
-      text = "Benar!";
+      primaryColor = Colors.orange;
+      bgColor = const Color(0xFFFFF3E0);
+      gradientColors = [const Color(0xFFFF9800), const Color(0xFFFFA726)];
+    } else if (_lastAnswerCorrect == true) {
+      title = "Hebat! 🎉";
+      subtitle = _getRandomCorrectMessage();
+      icon = Icons.emoji_events_rounded;
+      primaryColor = Colors.green;
+      bgColor = const Color(0xFFE8F5E9);
+      gradientColors = [const Color(0xFF4CAF50), const Color(0xFF66BB6A)];
     } else {
-      color = Colors.redAccent;
-      icon = Icons.cancel_rounded;
-      text = "Salah!";
+      title = "Yuk Coba Lagi! 💪";
+      subtitle = _getRandomWrongMessage();
+      icon = Icons.sentiment_satisfied_alt_rounded;
+      primaryColor = Colors.redAccent;
+      bgColor = const Color(0xFFFCE4EC);
+      gradientColors = [const Color(0xFFEF5350), const Color(0xFFFF7043)];
     }
 
-    return Container(
-      margin: const EdgeInsets.only(top: 24),
-      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.15),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: color, width: 2),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(icon, color: color, size: 36),
-          const SizedBox(width: 12),
-          Text(
-            text,
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: color,
+    return AnimatedBuilder(
+      animation: _popupAnimController,
+      builder: (context, child) {
+        return Opacity(
+          opacity: _popupOpacityAnim.value.clamp(0.0, 1.0),
+          child: Container(
+            color: Colors.black.withOpacity(0.4 * _popupOpacityAnim.value),
+            child: Center(
+              child: Transform.scale(
+                scale: _popupScaleAnim.value.clamp(0.0, 1.5),
+                child: Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 40),
+                  padding: const EdgeInsets.all(28),
+                  decoration: BoxDecoration(
+                    color: bgColor,
+                    borderRadius: BorderRadius.circular(28),
+                    boxShadow: [
+                      BoxShadow(
+                        color: primaryColor.withOpacity(0.3),
+                        blurRadius: 30,
+                        spreadRadius: 5,
+                        offset: const Offset(0, 10),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Gradient icon circle
+                      Container(
+                        width: 80,
+                        height: 80,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          gradient: LinearGradient(
+                            colors: gradientColors,
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: primaryColor.withOpacity(0.4),
+                              blurRadius: 16,
+                              offset: const Offset(0, 6),
+                            ),
+                          ],
+                        ),
+                        child: Icon(
+                          icon,
+                          color: Colors.white,
+                          size: 44,
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      // Title
+                      Text(
+                        title,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 26,
+                          fontWeight: FontWeight.w800,
+                          color: primaryColor,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      // Subtitle
+                      Text(
+                        subtitle,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: primaryColor.withOpacity(0.8),
+                          height: 1.4,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      // Animated dots indicator
+                      _buildDotsIndicator(primaryColor),
+                    ],
+                  ),
+                ),
+              ),
             ),
           ),
-        ],
-      ),
+        );
+      },
     );
+  }
+
+  Widget _buildDotsIndicator(Color color) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: List.generate(3, (index) {
+        return TweenAnimationBuilder<double>(
+          tween: Tween(begin: 0.0, end: 1.0),
+          duration: Duration(milliseconds: 400 + (index * 200)),
+          builder: (context, value, child) {
+            return Container(
+              margin: const EdgeInsets.symmetric(horizontal: 4),
+              width: 8,
+              height: 8,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: color.withOpacity(0.3 + (0.5 * value)),
+              ),
+            );
+          },
+        );
+      }),
+    );
+  }
+
+  String _getRandomCorrectMessage() {
+    final messages = [
+      "Kamu pintar sekali! Terus semangat ya!",
+      "Jawaban yang tepat! Kamu luar biasa!",
+      "Benar! Kamu sudah memahami materinya!",
+      "Mantap! Pertahankan terus ya!",
+      "Keren! Kamu bisa menjawab dengan benar!",
+    ];
+    return messages[Random().nextInt(messages.length)];
+  }
+
+  String _getRandomWrongMessage() {
+    final messages = [
+      "Tidak apa-apa, setiap kesalahan adalah pelajaran!",
+      "Tetap semangat! Kamu pasti bisa di soal berikutnya!",
+      "Jangan menyerah, yuk pelajari lagi materinya!",
+      "Hampir benar! Coba perhatikan lebih teliti ya!",
+      "Ayo semangat! Belajar dari kesalahan itu hebat!",
+    ];
+    return messages[Random().nextInt(messages.length)];
   }
 
   Widget _buildOption(BuildContext context, QuizProvider provider, int index) {

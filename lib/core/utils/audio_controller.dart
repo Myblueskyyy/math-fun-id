@@ -6,8 +6,13 @@ class AudioController {
   static AudioController get instance => _instance;
 
   final AudioPlayer _bgmPlayer = AudioPlayer();
-  // Reusable SFX player to avoid creating/disposing players that steal audio focus
+  // Reusable SFX player for short effects (clicks, correct/wrong)
   final AudioPlayer _sfxPlayer = AudioPlayer();
+  // Dedicated player for Voice Overs to ensure they are never cut off by SFX
+  final AudioPlayer _voPlayer = AudioPlayer();
+
+  Stream<void> get onVoComplete => _voPlayer.onPlayerComplete;
+  Stream<void> get onSfxComplete => _sfxPlayer.onPlayerComplete;
 
   String? _currentBgm;
   double _bgmVolume = 0.0;
@@ -26,6 +31,7 @@ class AudioController {
 
     _bgmPlayer.setReleaseMode(ReleaseMode.loop);
     _sfxPlayer.setReleaseMode(ReleaseMode.release);
+    _voPlayer.setReleaseMode(ReleaseMode.release);
   }
 
   // Fade parameters
@@ -116,11 +122,12 @@ class AudioController {
     await fadeToVolume(targetVolume);
   }
 
-  Future<void> playSfx(String assetPath) async {
+  Future<void> playSfx(String assetPath, {double volume = 1.0}) async {
     try {
       // Use the reusable SFX player — stops any previous SFX and plays the new one
       // This avoids creating/disposing AudioPlayer instances which can steal audio focus
       await _sfxPlayer.stop();
+      await _sfxPlayer.setVolume(volume);
       await _sfxPlayer.play(AssetSource('sounds/$assetPath'));
     } catch (e) {
       print('Error playing SFX $assetPath: $e');
@@ -131,6 +138,23 @@ class AudioController {
     await _sfxPlayer.stop();
   }
 
+  Future<void> playVo(String assetPath) async {
+    try {
+      // Force volume to absolute maximum (1.0)
+      await _voPlayer.stop();
+      await _voPlayer.setVolume(1.0);
+      await _voPlayer.play(AssetSource('sounds/$assetPath'));
+      // Re-assert volume after play starts to handle potential platform resets
+      await _voPlayer.setVolume(1.0);
+    } catch (e) {
+      print('Error playing VO $assetPath: $e');
+    }
+  }
+
+  Future<void> stopVo() async {
+    await _voPlayer.stop();
+  }
+
   Future<void> playButtonClick() async {
     await playSfx('button_click.mp3');
   }
@@ -139,6 +163,7 @@ class AudioController {
     _fadeTimer?.cancel();
     _bgmPlayer.stop();
     _sfxPlayer.stop();
+    _voPlayer.stop();
     _currentBgm = null;
     _bgmVolume = 0.0;
   }

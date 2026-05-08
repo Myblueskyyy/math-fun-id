@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../core/constants/app_colors.dart';
 import '../../shared/models/materi.dart';
@@ -22,6 +23,7 @@ class _MateriDetailScreenState extends State<MateriDetailScreen>
   bool isVoPlaying = false;
   bool showCharacter = true;
   late AnimationController _floatingController;
+  StreamSubscription? _sfxSubscription;
 
   @override
   void initState() {
@@ -30,13 +32,25 @@ class _MateriDetailScreenState extends State<MateriDetailScreen>
       vsync: this,
       duration: const Duration(seconds: 2),
     )..repeat(reverse: true);
+
+    _sfxSubscription = AudioController.instance.onVoComplete.listen((_) {
+      if (mounted) {
+        AudioController.instance.fadeToVolume(0.5);
+        setState(() {
+          isVoPlaying = false;
+        });
+      }
+    });
+
     _startVO();
   }
 
   @override
   void dispose() {
+    _sfxSubscription?.cancel();
     _floatingController.dispose();
-    AudioController.instance.stopSfx();
+    AudioController.instance.stopVo();
+    AudioController.instance.fadeToVolume(0.5);
     super.dispose();
   }
 
@@ -45,13 +59,15 @@ class _MateriDetailScreenState extends State<MateriDetailScreen>
       setState(() {
         isVoPlaying = true;
       });
-      AudioController.instance.playSfx(widget.materi.voiceOverPath!);
+      AudioController.instance.playVo(widget.materi.voiceOverPath!);
+      AudioController.instance.fadeToVolume(0.05);
     }
   }
 
   void _toggleVO() {
     if (isVoPlaying) {
-      AudioController.instance.stopSfx();
+      AudioController.instance.stopVo();
+      AudioController.instance.fadeToVolume(0.5);
       setState(() {
         isVoPlaying = false;
       });
@@ -449,6 +465,15 @@ class _MateriDetailScreenState extends State<MateriDetailScreen>
   }
 
   void _launchVisualNovel(BuildContext context, String title) {
+    // Stop VO if playing
+    if (isVoPlaying) {
+      AudioController.instance.stopVo();
+      AudioController.instance.fadeToVolume(0.5);
+      setState(() {
+        isVoPlaying = false;
+      });
+    }
+
     Map<String, StoryNode> storyData = {};
     if (title == 'Jual-Beli') {
       storyData = StoryData.getEpisode1();
