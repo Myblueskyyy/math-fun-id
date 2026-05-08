@@ -237,7 +237,7 @@ class _QuizScreenState extends State<QuizScreen>
                     ),
                   ),
                 ),
-              if (provider.currentQuizType == QuizType.postTest)
+              if (provider.currentQuizType == QuizType.postTest1 || provider.currentQuizType == QuizType.postTest2 || provider.currentQuizType == QuizType.postTest3)
                 Positioned(
                   right: 20,
                   bottom: 20,

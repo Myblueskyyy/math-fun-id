@@ -14,6 +14,9 @@ class Materi {
   final String? caseStudy;
   final Widget Function(BuildContext)? visualIllustrationWidget;
   final String? voiceOverPath;
+  
+  // New property for multiple VNs
+  final List<Map<String, dynamic>>? visualNovels;
 
   Materi({
     required this.title,
@@ -27,6 +30,7 @@ class Materi {
     this.caseStudy,
     this.visualIllustrationWidget,
     this.voiceOverPath,
+    this.visualNovels,
   });
 }
 

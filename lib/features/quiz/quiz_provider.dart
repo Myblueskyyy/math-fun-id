@@ -1,9 +1,19 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../shared/models/question.dart';
 import '../../core/utils/audio_controller.dart';
 
-enum QuizType { preTest, postTest, simulation }
+enum QuizType {
+  preTest,
+  diskusi1,
+  postTest1,
+  diskusi2,
+  postTest2,
+  diskusi3,
+  postTest3,
+  simulation
+}
 
 class QuizProvider extends ChangeNotifier {
   List<Question> _questions = [];
@@ -11,14 +21,12 @@ class QuizProvider extends ChangeNotifier {
   int _correctAnswersCount = 0;
   List<int?> _userAnswers = [];
   bool _isCompleted = false;
-
-  bool _isProcessingFeedback = false; // To freeze UI during the 1.5s delay
-
+  bool _isProcessingFeedback = false;
   QuizType? _currentQuizType;
-  int? preTestScore;
-  int? postTestScore;
-  int preTestTotal = 0;
-  int postTestTotal = 0;
+
+  // Persistence
+  Map<QuizType, int> scores = {};
+  Map<QuizType, int> totals = {};
 
   List<Question> get questions => _questions;
   int get currentIndex => _currentIndex;
@@ -30,6 +38,59 @@ class QuizProvider extends ChangeNotifier {
 
   Question get currentQuestion => _questions[_currentIndex];
   bool get isLastQuestion => _currentIndex == _questions.length - 1;
+
+  QuizProvider() {
+    _loadProgress();
+  }
+
+  Future<void> _loadProgress() async {
+    final prefs = await SharedPreferences.getInstance();
+    for (var type in QuizType.values) {
+      if (type == QuizType.simulation) continue;
+      
+      final score = prefs.getInt('${type.name}_score');
+      final total = prefs.getInt('${type.name}_total');
+      if (score != null && total != null) {
+        scores[type] = score;
+        totals[type] = total;
+      }
+    }
+    notifyListeners();
+  }
+
+  Future<void> _saveProgress(QuizType type, int score, int total) async {
+    if (type == QuizType.simulation) return;
+    
+    scores[type] = score;
+    totals[type] = total;
+    
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('${type.name}_score', score);
+    await prefs.setInt('${type.name}_total', total);
+    notifyListeners();
+  }
+
+  Future<void> resetAllData() async {
+    scores.clear();
+    totals.clear();
+    final prefs = await SharedPreferences.getInstance();
+    for (var type in QuizType.values) {
+      if (type == QuizType.simulation) continue;
+      await prefs.remove('${type.name}_score');
+      await prefs.remove('${type.name}_total');
+    }
+    notifyListeners();
+  }
+
+  bool get isAllTestsCompleted {
+    return scores.containsKey(QuizType.preTest) &&
+        scores.containsKey(QuizType.diskusi1) &&
+        scores.containsKey(QuizType.postTest1) &&
+        scores.containsKey(QuizType.diskusi2) &&
+        scores.containsKey(QuizType.postTest2) &&
+        scores.containsKey(QuizType.diskusi3) &&
+        scores.containsKey(QuizType.postTest3);
+  }
 
   void startQuiz(
     List<Question> questions, {
@@ -49,12 +110,8 @@ class QuizProvider extends ChangeNotifier {
     _isProcessingFeedback = false;
     if (isLastQuestion) {
       _isCompleted = true;
-      if (_currentQuizType == QuizType.preTest) {
-        preTestScore = _correctAnswersCount;
-        preTestTotal = _questions.length;
-      } else if (_currentQuizType == QuizType.postTest) {
-        postTestScore = _correctAnswersCount;
-        postTestTotal = _questions.length;
+      if (_currentQuizType != null && _currentQuizType != QuizType.simulation) {
+        _saveProgress(_currentQuizType!, _correctAnswersCount, _questions.length);
       }
     } else {
       _currentIndex++;

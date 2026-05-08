@@ -236,10 +236,10 @@ class _MateriDetailScreenState extends State<MateriDetailScreen>
       const SizedBox(height: 24),
 
       // 1.5 Visual Novel Integration
-      if (_hasVisualNovel(widget.materi.title)) ...[
-        Container(
+      if (widget.materi.visualNovels != null && widget.materi.visualNovels!.isNotEmpty) ...[
+        ...widget.materi.visualNovels!.map((vn) => Container(
           width: double.infinity,
-          margin: const EdgeInsets.only(bottom: 24),
+          margin: const EdgeInsets.only(bottom: 16),
           child: ElevatedButton.icon(
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.purple.shade400,
@@ -252,15 +252,16 @@ class _MateriDetailScreenState extends State<MateriDetailScreen>
             ),
             onPressed: () {
               AudioController.instance.playButtonClick();
-              _launchVisualNovel(context, widget.materi.title);
+              _launchVisualNovel(context, vn['episode']);
             },
             icon: const Icon(Icons.videogame_asset_rounded, size: 28),
-            label: const Text(
-              'Mainkan Cerita Interaktif',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            label: Text(
+              vn['title'],
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
           ),
-        ),
+        )),
+        const SizedBox(height: 8),
       ],
 
       // 2. Visual Illustration
@@ -457,14 +458,7 @@ class _MateriDetailScreenState extends State<MateriDetailScreen>
     );
   }
 
-  bool _hasVisualNovel(String title) {
-    return title == 'Jual-Beli' ||
-        title == 'Untung-Rugi' ||
-        title == 'Diskon' ||
-        title == 'Pajak';
-  }
-
-  void _launchVisualNovel(BuildContext context, String title) {
+  void _launchVisualNovel(BuildContext context, String episode) {
     // Stop VO if playing
     if (isVoPlaying) {
       AudioController.instance.stopVo();
@@ -475,13 +469,13 @@ class _MateriDetailScreenState extends State<MateriDetailScreen>
     }
 
     Map<String, StoryNode> storyData = {};
-    if (title == 'Jual-Beli') {
+    if (episode == 'Episode1') {
       storyData = StoryData.getEpisode1();
-    } else if (title == 'Untung-Rugi') {
+    } else if (episode == 'Episode2') {
       storyData = StoryData.getEpisode2();
-    } else if (title == 'Diskon') {
+    } else if (episode == 'Episode3') {
       storyData = StoryData.getEpisode3();
-    } else if (title == 'Pajak') {
+    } else if (episode == 'Episode4') {
       storyData = StoryData.getEpisode4();
     }
 

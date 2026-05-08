@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../core/constants/app_strings.dart';
-import '../quiz/quiz_provider.dart';
-import '../quiz/quiz_repository.dart';
-import '../quiz/quiz_screen.dart';
+
 import '../materi/materi_list_screen.dart';
 import '../evaluasi/evaluasi_screen.dart';
 import '../../core/widgets/bubbly_background.dart';
@@ -44,37 +41,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Flexible(
+                    flex: 2,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Flexible(
-                          child: InkWell(
-                            onTap: () {
-                              AudioController.instance.playButtonClick();
-                              final provider = Provider.of<QuizProvider>(
-                                context,
-                                listen: false,
-                              );
-                              provider.startQuiz(
-                                QuizRepository.preTestQuestions,
-                                type: QuizType.preTest,
-                              );
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => const QuizScreen(
-                                    title: AppStrings.menuSimulasi,
-                                  ),
-                                ),
-                              );
-                            },
-                            child: Image.asset(
-                              'assets/images/home_screen/pre_test_button.png',
-                              fit: BoxFit.contain,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 16),
                         Flexible(
                           child: InkWell(
                             onTap: () {
@@ -88,40 +58,6 @@ class _HomeScreenState extends State<HomeScreen> {
                             },
                             child: Image.asset(
                               'assets/images/home_screen/materi_button.png',
-                              fit: BoxFit.contain,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  Flexible(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Flexible(
-                          child: InkWell(
-                            onTap: () {
-                              AudioController.instance.playButtonClick();
-                              final provider = Provider.of<QuizProvider>(
-                                context,
-                                listen: false,
-                              );
-                              provider.startQuiz(
-                                QuizRepository.postTestQuestions,
-                                type: QuizType.postTest,
-                              );
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) =>
-                                      const QuizScreen(title: 'Evaluasi'),
-                                ),
-                              );
-                            },
-                            child: Image.asset(
-                              'assets/images/home_screen/post_test_button.png',
                               fit: BoxFit.contain,
                             ),
                           ),

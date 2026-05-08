@@ -14,24 +14,7 @@ class EvaluasiScreen extends StatefulWidget {
 }
 
 class _EvaluasiScreenState extends State<EvaluasiScreen> {
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final provider = context.read<QuizProvider>();
-      final preTestScore = provider.preTestScore;
-      final postTestScore = provider.postTestScore;
-
-      if (preTestScore != null && postTestScore != null) {
-        if (postTestScore > preTestScore) {
-          AudioController.instance.playSfx('stage_win.mp3');
-        } else if (postTestScore < preTestScore) {
-          AudioController.instance.playSfx('stage_lose.mp3');
-        }
-      }
-    });
-  }
-
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -39,12 +22,19 @@ class _EvaluasiScreenState extends State<EvaluasiScreen> {
       backgroundColor: Colors.transparent,
       appBar: AppBar(
         title: const Text(
-          'Hasil Evaluasi',
+          'Dasbor Evaluasi',
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.white),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh_rounded),
+            tooltip: 'Reset Data',
+            onPressed: () => _showResetDialog(context),
+          )
+        ],
       ),
       body: BubblyBackground(
         child: SafeArea(
@@ -52,88 +42,26 @@ class _EvaluasiScreenState extends State<EvaluasiScreen> {
             padding: const EdgeInsets.all(24.0),
             child: Consumer<QuizProvider>(
               builder: (context, provider, child) {
-                final preTestScore = provider.preTestScore;
-                final postTestScore = provider.postTestScore;
-
-                if (preTestScore == null || postTestScore == null) {
-                  return Center(
-                    child: CustomCard(
-                      padding: 24,
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(
-                            Icons.info_outline_rounded,
-                            size: 64,
-                            color: AppColors.primary,
-                          ),
-                          const SizedBox(height: 16),
-                          const Text(
-                            'Hasil Belum Tersedia',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.primary,
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                          const Text(
-                            'Selesaikan Pre-Test dan Post-Test terlebih dahulu untuk melihat ringkasan evaluasi hasil belajarmu.',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(fontSize: 16),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                }
-
-                String summaryTitle = "";
-                String summaryDesc = "";
-                Color summaryColor = AppColors.primary;
-                IconData summaryIcon = Icons.emoji_events_rounded;
-
-                if (postTestScore > preTestScore) {
-                  summaryTitle = "Luar Biasa!";
-                  summaryDesc =
-                      "Kamu mengalami peningkatan yang hebat setelah belajar materi.";
-                  summaryColor = Colors.green;
-                  summaryIcon = Icons.trending_up_rounded;
-                } else if (postTestScore < preTestScore) {
-                  summaryTitle = "Jangan Menyerah!";
-                  summaryDesc =
-                      "Nilai post-test mu menurun. Ayo pelajari kembali materinya berlatih lagi!";
-                  summaryColor = Colors.orange;
-                  summaryIcon = Icons.trending_down_rounded;
-                } else {
-                  if (postTestScore == provider.postTestTotal &&
-                      postTestScore > 0) {
-                    summaryTitle = "Sempurna!";
-                    summaryDesc =
-                        "Kamu berhasil mempertahankan nilai sempurna. Pertahankan prestasimu!";
-                    summaryColor = Colors.blue;
-                    summaryIcon = Icons.star_rounded;
-                  } else {
-                    summaryTitle = "Tetap Semangat!";
-                    summaryDesc =
-                        "Nilaimu masih sama dengan sebelumnya. Mari belajar lebih giat lagi.";
-                    summaryColor = Colors.blueGrey;
-                    summaryIcon = Icons.trending_flat_rounded;
-                  }
-                }
+                final isCompleted = provider.isAllTestsCompleted;
 
                 return SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
                   child: Column(
                     children: [
+                      // Header Card
                       CustomCard(
                         padding: 24,
-                        color: summaryColor,
+                        color: isCompleted ? Colors.green : Colors.orange,
                         child: Column(
                           children: [
-                            Icon(summaryIcon, size: 60, color: Colors.white),
+                            Icon(
+                              isCompleted ? Icons.emoji_events_rounded : Icons.pending_actions_rounded, 
+                              size: 60, 
+                              color: Colors.white
+                            ),
                             const SizedBox(height: 16),
                             Text(
-                              summaryTitle,
+                              isCompleted ? "Luar Biasa!" : "Belum Selesai",
                               style: const TextStyle(
                                 fontSize: 24,
                                 fontWeight: FontWeight.bold,
@@ -142,7 +70,9 @@ class _EvaluasiScreenState extends State<EvaluasiScreen> {
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              summaryDesc,
+                              isCompleted 
+                                ? "Kamu telah menyelesaikan semua tes dan evaluasi. Berikut adalah ringkasan hasil belajarmu!"
+                                : "Kamu belum menyelesaikan semua tes. Silakan selesaikan setiap tes di semua Pertemuan untuk melihat hasil akhir.",
                               textAlign: TextAlign.center,
                               style: const TextStyle(
                                 fontSize: 16,
@@ -153,29 +83,50 @@ class _EvaluasiScreenState extends State<EvaluasiScreen> {
                         ),
                       ),
                       const SizedBox(height: 24),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: _buildScoreCard(
-                              context: context,
-                              title: "Pre-Test",
-                              score: preTestScore,
-                              total: provider.preTestTotal,
-                              icon: Icons.assignment_rounded,
-                            ),
+                      
+                      // Progress List
+                      _buildTestStatusRow(context, provider, 'Pertemuan 1: Pre-Test', QuizType.preTest),
+                      _buildTestStatusRow(context, provider, 'Pertemuan 1: Diskusi', QuizType.diskusi1),
+                      _buildTestStatusRow(context, provider, 'Pertemuan 1: Post-Test', QuizType.postTest1),
+                      _buildTestStatusRow(context, provider, 'Pertemuan 2: Diskusi', QuizType.diskusi2),
+                      _buildTestStatusRow(context, provider, 'Pertemuan 2: Post-Test', QuizType.postTest2),
+                      _buildTestStatusRow(context, provider, 'Pertemuan 3: Diskusi', QuizType.diskusi3),
+                      _buildTestStatusRow(context, provider, 'Pertemuan 3: Post-Test', QuizType.postTest3),
+
+                      const SizedBox(height: 32),
+
+                      if (isCompleted) ...[
+                        const Text(
+                          'Ringkasan Nilai Akhir',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.textPrimary,
                           ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: _buildScoreCard(
-                              context: context,
-                              title: "Post-Test",
-                              score: postTestScore,
-                              total: provider.postTestTotal,
-                              icon: Icons.assignment_turned_in_rounded,
+                        ),
+                        const SizedBox(height: 16),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _buildFinalScoreCard(
+                                title: "Total Benar",
+                                value: _calculateTotalScore(provider).toString(),
+                                color: Colors.blue,
+                                icon: Icons.check_circle_rounded,
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: _buildFinalScoreCard(
+                                title: "Akurasi",
+                                value: "${_calculateAccuracy(provider)}%",
+                                color: Colors.purple,
+                                icon: Icons.percent_rounded,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ]
                     ],
                   ),
                 );
@@ -187,11 +138,112 @@ class _EvaluasiScreenState extends State<EvaluasiScreen> {
     );
   }
 
-  Widget _buildScoreCard({
-    required BuildContext context,
+  void _showResetDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Reset Progres?'),
+        content: const Text('Apakah kamu yakin ingin mereset semua data progres belajar dan nilai evaluasi? Data yang dihapus tidak dapat dikembalikan.'),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Batal'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            onPressed: () {
+              context.read<QuizProvider>().resetAllData();
+              Navigator.pop(ctx);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Progres berhasil direset!')),
+              );
+            },
+            child: const Text('Ya, Reset', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  int _calculateTotalScore(QuizProvider provider) {
+    int total = 0;
+    for (var score in provider.scores.values) {
+      total += score;
+    }
+    return total;
+  }
+
+  int _calculateTotalQuestions(QuizProvider provider) {
+    int total = 0;
+    for (var t in provider.totals.values) {
+      total += t;
+    }
+    return total;
+  }
+
+  int _calculateAccuracy(QuizProvider provider) {
+    int score = _calculateTotalScore(provider);
+    int total = _calculateTotalQuestions(provider);
+    if (total == 0) return 0;
+    return ((score / total) * 100).round();
+  }
+
+  Widget _buildTestStatusRow(BuildContext context, QuizProvider provider, String title, QuizType type) {
+    final hasScore = provider.scores.containsKey(type);
+    final score = provider.scores[type];
+    final total = provider.totals[type];
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12.0),
+      child: CustomCard(
+        color: Colors.white,
+        padding: 16,
+        child: Row(
+          children: [
+            Icon(
+              hasScore ? Icons.check_circle_rounded : Icons.radio_button_unchecked_rounded,
+              color: hasScore ? Colors.green : Colors.grey,
+              size: 28,
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+            ),
+            if (hasScore)
+              Text(
+                '$score / $total',
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.primary,
+                ),
+              )
+            else
+              const Text(
+                '-',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.grey,
+                ),
+              )
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFinalScoreCard({
     required String title,
-    required int score,
-    required int total,
+    required String value,
+    required Color color,
     required IconData icon,
   }) {
     return CustomCard(
@@ -199,32 +251,27 @@ class _EvaluasiScreenState extends State<EvaluasiScreen> {
       color: Colors.white,
       child: Column(
         children: [
-          Icon(icon, size: 36, color: AppColors.primary),
+          Icon(icon, size: 36, color: color),
           const SizedBox(height: 12),
           Text(
             title,
             style: const TextStyle(
               fontWeight: FontWeight.bold,
-              fontSize: 18,
-              color: Colors.black,
+              fontSize: 16,
+              color: Colors.black54,
             ),
           ),
           const SizedBox(height: 8),
           Text(
-            '$score / $total',
-            style: const TextStyle(
+            value,
+            style: TextStyle(
               fontSize: 28,
               fontWeight: FontWeight.bold,
-              color: AppColors.primary,
+              color: color,
             ),
-          ),
-          const Text(
-            'Jawaban Benar',
-            style: TextStyle(fontSize: 12, color: Colors.black54),
           ),
         ],
       ),
     );
   }
 }
-

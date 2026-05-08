@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'home_screen.dart';
+import 'user_guide_screen.dart';
 import 'intro_screen.dart';
 import '../../core/widgets/bubbly_background.dart';
 import '../../core/utils/audio_controller.dart';
@@ -94,23 +95,32 @@ class WelcomeScreen extends StatelessWidget {
 
                         const SizedBox(width: 24),
 
-                        // Custom Play Button Image
-                        InkWell(
-                          onTap: () {
+                        // Custom Play Button
+                        ElevatedButton.icon(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.amber,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 32, vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                            elevation: 5,
+                          ),
+                          onPressed: () {
                             AudioController.instance.playButtonClick();
                             Navigator.of(context).pushReplacement(
                               MaterialPageRoute(
-                                builder: (_) => const HomeScreen(),
+                                builder: (_) => const UserGuideScreen(),
                               ),
                             );
                           },
-                          splashColor: Colors.white24,
-                          highlightColor: Colors.transparent,
-                          child: SizedBox(
-                            height: 80,
-                            child: Image.asset(
-                              'assets/images/welcome_screen/button_mulai.png',
-                              fit: BoxFit.contain,
+                          icon: const Icon(Icons.play_arrow_rounded, size: 32),
+                          label: const Text(
+                            "Let's Go!",
+                            style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
                         ),
