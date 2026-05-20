@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 import '../materi/materi_list_screen.dart';
 import '../evaluasi/evaluasi_screen.dart';
@@ -7,6 +6,7 @@ import '../../core/widgets/bubbly_background.dart';
 import '../platformer/presentation/platformer_screen.dart';
 import '../frog_jump/presentation/frog_jump_screen.dart';
 import '../../core/utils/audio_controller.dart';
+import 'biodata_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -30,6 +30,26 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFE0F7FA),
       extendBodyBehindAppBar: true,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: IconButton(
+              icon: const Icon(Icons.person_rounded, color: Colors.white, size: 28),
+              tooltip: 'Biodata Penulis',
+              onPressed: () {
+                AudioController.instance.playButtonClick();
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const BiodataScreen()),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
       body: BubblyBackground(
         child: SafeArea(
           child: Center(
